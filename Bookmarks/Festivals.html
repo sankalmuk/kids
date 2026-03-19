@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="page-title">Festival Activities for Young Learners</title>
+<style>
+:root{
+  --gold:#C9A84C;--gold-light:#E8D08A;--gold-dark:#8B6914;
+  --silver-dark:#808080;--white:#FFFFFF;--off-white:#F8F6F0;
+  --text-dark:#2C2416;--text-mid:#5A4A2A;
+  --accent-red:#8B1A1A;--accent-blue:#1A3A6B;
+  --correct:#2E7D32;--wrong:#C62828;
+  --correct-bg:#E8F5E9;--wrong-bg:#FFEBEE;--reveal-bg:#FFF8E1;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Georgia','Times New Roman',serif;background:linear-gradient(135deg,#F8F6F0 0%,#EDE8DC 50%,#F8F6F0 100%);min-height:100vh;color:var(--text-dark);}
+#app{max-width:1100px;margin:0 auto;padding:10px;}
+
+/* LOADING SCREEN */
+#loading-screen{
+  position:fixed;inset:0;background:linear-gradient(135deg,#2C2416,#5A4A2A);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  z-index:9999;transition:opacity .5s ease;
+}
+#loading-screen.hidden{opacity:0;pointer-events:none;}
+.loader-logo{font-size:4em;margin-bottom:20px;animation:pulse 1.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.1);}}
+.loader-title{font-size:1.8em;font-weight:bold;color:var(--gold-light);font-family:Georgia,serif;margin-bottom:8px;}
+.loader-sub{font-size:1em;color:#ccc;margin-bottom:30px;}
+.loader-bar-wrap{width:280px;height:8px;background:rgba(255,255,255,.15);border-radius:4px;overflow:hidden;}
+.loader-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--gold-dark),var(--gold));border-radius:4px;transition:width .4s ease;}
+.loader-status{font-size:.82em;color:var(--gold-light);margin-top:12px;height:1.2em;}
+.loader-error{color:#ff8080;font-size:.9em;margin-top:16px;text-align:center;max-width:320px;display:none;}
+
+/* HEADER */
+#header img{width:100%;height:auto;object-fit:contain;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.2);display:block;}
+#header .logo-fallback{background:linear-gradient(135deg,#2C2416,#5A4A2A);border-radius:8px;padding:20px;text-align:center;color:var(--gold-light);font-size:1.4em;font-weight:bold;}
+
+/* NAV — scores embedded in buttons, no separate score bar */
+#nav{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;background:linear-gradient(135deg,#2C2416,#5A4A2A);padding:10px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.3);align-items:center;}
+.nav-btn{background:linear-gradient(135deg,var(--gold-dark),var(--gold));color:#fff;border:none;border-radius:20px;padding:7px 14px;font-size:.8em;font-family:Georgia,serif;font-weight:bold;cursor:pointer;transition:all .2s;box-shadow:0 2px 6px rgba(0,0,0,.3);}
+.nav-btn:hover{transform:translateY(-1px);}
+.nav-btn.active{background:linear-gradient(135deg,var(--accent-red),#C62828);}
+.regen-btn{background:linear-gradient(135deg,#1A3A6B,#2E5FB3);margin-left:auto;}
+.pdf-btn{background:linear-gradient(135deg,#2E7D32,#43A047);}
+.ans-btn{background:linear-gradient(135deg,#6A1B9A,#8E24AA);}
+.nav-total{background:rgba(255,255,255,.25);color:#fff;border-radius:20px;padding:6px 14px;font-size:.85em;font-weight:bold;white-space:nowrap;}
+
+/* SECTION */
+.section{display:none;background:#fff;border-radius:12px;padding:20px;margin-top:8px;box-shadow:0 4px 20px rgba(0,0,0,.1);border:1px solid var(--gold-light);}
+.section.active{display:block;animation:fadeIn .3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.section-title{font-size:1.4em;color:var(--gold-dark);border-bottom:2px solid var(--gold-light);padding-bottom:8px;margin-bottom:14px;font-weight:bold;}
+
+/* WORDBANK */
+.wordbank{background:var(--off-white);border:1px solid var(--gold-light);border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:.83em;color:var(--text-mid);line-height:1.9;}
+.wordbank strong{color:var(--gold-dark);display:block;margin-bottom:4px;}
+.wordbank span{font-weight:bold;}
+.bank-clickable{display:inline-block;margin:2px 4px;padding:3px 10px;background:#fff;border:1.5px solid var(--gold-light);border-radius:12px;cursor:pointer;font-size:.82em;font-weight:bold;transition:all .15s;user-select:none;}
+.bank-clickable:hover{border-color:var(--gold-dark);background:var(--gold-light);}
+.bank-clickable.used{opacity:.4;cursor:default;text-decoration:line-through;}
+
+/* BUTTONS */
+.btn-row{display:flex;gap:12px;justify-content:center;margin-top:16px;flex-wrap:wrap;}
+.check-btn{background:linear-gradient(135deg,var(--gold-dark),var(--gold));color:#fff;border:none;border-radius:20px;padding:10px 28px;font-size:.95em;font-family:Georgia,serif;font-weight:bold;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.2);}
+.check-btn:hover{transform:translateY(-2px);}
+.reveal-btn{background:linear-gradient(135deg,#5A4A2A,#8B6914);color:#fff;border:none;border-radius:20px;padding:10px 28px;font-size:.95em;font-family:Georgia,serif;font-weight:bold;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.2);}
+.reveal-btn:hover{transform:translateY(-2px);}
+.section-score{text-align:center;font-size:1em;font-weight:bold;color:var(--gold-dark);margin-top:10px;padding:8px;background:var(--off-white);border-radius:8px;border:1px solid var(--gold-light);}
+.reveal-panel{display:none;background:var(--reveal-bg);border:2px solid var(--gold);border-radius:10px;padding:14px;margin-top:14px;}
+.reveal-panel.show{display:block;animation:fadeIn .3s ease;}
+.reveal-panel h4{color:var(--gold-dark);margin-bottom:10px;font-size:1em;}
+.reveal-table{width:100%;border-collapse:collapse;font-size:.82em;}
+.reveal-table th{background:var(--gold-light);color:var(--text-dark);padding:5px 8px;text-align:left;font-weight:bold;}
+.reveal-table td{padding:4px 8px;border-bottom:1px solid var(--gold-light);}
+.reveal-table tr:nth-child(even) td{background:rgba(201,168,76,.08);}
+.reveal-answer{font-weight:bold;color:var(--accent-blue);}
+
+/* CROSSWORD */
+#cw-container{overflow-x:auto;}
+.cw-grid{border-collapse:collapse;margin:0 auto 16px;}
+.cw-grid td{width:32px;height:32px;border:1px solid #ccc;text-align:center;vertical-align:middle;position:relative;font-size:.85em;}
+.cw-grid td.black{background:#333;border-color:#333;}
+.cw-grid td.white{background:#fff;}
+.cw-grid td .cell-num{position:absolute;top:1px;left:2px;font-size:.55em;color:var(--gold-dark);font-weight:bold;line-height:1;}
+.cw-grid td input{width:100%;height:100%;border:none;outline:none;text-align:center;font-size:.9em;font-weight:bold;background:transparent;font-family:Georgia,serif;text-transform:uppercase;padding:0;caret-color:var(--gold-dark);cursor:pointer;}
+.cw-grid td.correct{background:var(--correct-bg)!important;}
+.cw-grid td.wrong{background:var(--wrong-bg)!important;}
+.cw-grid td.active-cw{background:#FFF9C4!important;outline:2px solid var(--gold-dark);}
+.cw-grid td.revealed{background:#FFF9C4!important;}
+.cw-clues{display:flex;gap:20px;flex-wrap:wrap;margin-top:10px;}
+.cw-clues-col{flex:1;min-width:200px;}
+.cw-clues-col h4{color:var(--gold-dark);margin-bottom:6px;font-size:.95em;font-weight:bold;}
+.cw-clues-col li{font-size:.82em;margin-bottom:5px;color:var(--text-mid);font-weight:bold;}
+
+/* WORD SEARCH — cell size set by JS via --ws-cell CSS variable */
+.ws-grid-wrap{margin-bottom:10px;}
+.ws-row{display:flex;gap:2px;justify-content:center;flex-wrap:nowrap;margin-bottom:2px;}
+.ws-cell{width:var(--ws-cell,34px);height:var(--ws-cell,34px);display:flex;align-items:center;justify-content:center;font-size:var(--ws-font,.9em);font-weight:bold;border:1.5px solid #e0d9c8;background:var(--off-white);border-radius:3px;cursor:pointer;user-select:none;transition:background .15s;text-transform:uppercase;font-family:'Courier New',monospace;flex-shrink:0;}
+.ws-cell.selected{background:var(--gold-light);border-color:var(--gold-dark);}
+.ws-cell.found{background:var(--correct-bg);border-color:var(--correct);color:var(--correct);}
+.ws-word-list{columns:2;column-gap:10px;margin-top:10px;font-size:.9em;}
+.ws-word-item{margin-bottom:4px;color:var(--text-mid);font-weight:bold;}
+.ws-word-item.found-word{color:var(--correct);text-decoration:line-through;}
+/* SECTION INSTRUCTIONS */
+.section-instructions{background:linear-gradient(135deg,#FEF9EE,#FDF3D0);border:1px solid var(--gold-light);border-left:4px solid var(--gold);border-radius:0 8px 8px 0;padding:8px 14px;margin-bottom:14px;font-size:.84em;color:var(--text-mid);line-height:1.6;}
+.section-instructions strong{color:var(--gold-dark);}
+
+/* JUMBLED */
+.jumble-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;}
+.jumble-item{background:var(--off-white);border:2px solid var(--gold-light);border-radius:8px;padding:10px;cursor:pointer;transition:border-color .15s;}
+.jumble-item:hover{border-color:var(--gold);}
+.jumble-item.focused-jw{border-color:var(--gold-dark)!important;background:#FFFDE7;box-shadow:0 0 0 2px var(--gold-light);}
+.jumble-item .jumbled{font-size:1.15em;font-weight:bold;color:var(--gold-dark);letter-spacing:3px;margin-bottom:5px;}
+.jumble-item .hint{font-size:.8em;color:var(--text-mid);margin-bottom:6px;font-style:italic;font-weight:bold;}
+.jumble-item .jw-answer{font-size:.95em;font-weight:bold;color:var(--accent-blue);min-height:1.4em;padding:4px 6px;border-bottom:2px solid var(--gold-light);margin-top:4px;letter-spacing:1px;}
+.jumble-item.correct{border-color:var(--correct);background:var(--correct-bg);}
+.jumble-item.wrong{border-color:var(--wrong);background:var(--wrong-bg);}
+.click-hint{font-size:.72em;color:var(--silver-dark);margin-top:3px;font-style:italic;}
+
+/* MATCH PAIRS — always 2-column side by side on all screen sizes */
+.match-container{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.match-col h4{color:var(--gold-dark);margin-bottom:8px;text-align:center;font-size:.9em;font-weight:bold;}
+.match-item{background:var(--off-white);border:2px solid var(--gold-light);border-radius:8px;padding:7px 8px;margin-bottom:6px;cursor:pointer;font-size:.82em;text-align:center;transition:all .2s;font-family:Georgia,serif;font-weight:bold;word-break:break-word;}
+.match-item:hover{border-color:var(--gold-dark);background:var(--gold-light);}
+.match-item.selected{border-color:var(--gold-dark);background:var(--gold-light);}
+.match-item.matched{border-color:var(--correct);background:var(--correct-bg);color:var(--correct);cursor:default;}
+.match-item.wrong-match{border-color:var(--wrong);background:var(--wrong-bg);}
+
+/* FILL BLANKS */
+.fitb-story-block{margin-bottom:20px;background:var(--off-white);border:1px solid var(--gold-light);border-radius:10px;padding:14px;}
+.fitb-story-block .story-num{font-weight:bold;color:var(--gold-dark);margin-bottom:8px;font-size:.9em;}
+.fitb-story-wordbank{background:#fff;border:1px dashed var(--gold);border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:.82em;}
+.fitb-story-wordbank strong{color:var(--gold-dark);display:block;margin-bottom:4px;font-size:.85em;}
+.fitb-bank-word{display:inline-block;margin:2px 3px;padding:3px 9px;background:#fff;border:1.5px solid var(--gold-light);border-radius:12px;cursor:pointer;font-size:.82em;font-weight:bold;transition:all .15s;}
+.fitb-bank-word:hover{border-color:var(--gold-dark);background:var(--gold-light);}
+.fitb-bank-word.used{opacity:.4;text-decoration:line-through;cursor:default;}
+.fitb-bank-word.selected{border-color:var(--gold-dark);background:var(--gold-light);box-shadow:0 0 0 2px var(--gold);}
+.fitb-story-text{font-weight:bold;font-size:.92em;line-height:2.1;}
+.blank-word{display:inline-block;min-width:80px;border-bottom:2px solid var(--gold-dark);text-align:center;margin:0 4px;padding:2px 6px;cursor:pointer;border-radius:4px 4px 0 0;background:rgba(201,168,76,.1);transition:background .2s;vertical-align:middle;font-size:.9em;font-weight:bold;}
+.blank-word:hover{background:rgba(201,168,76,.3);}
+.blank-word.filled{background:rgba(201,168,76,.25);color:var(--accent-blue);}
+.blank-word.correct{background:var(--correct-bg);color:var(--correct);border-bottom-color:var(--correct);}
+.blank-word.wrong{background:var(--wrong-bg);color:var(--wrong);border-bottom-color:var(--wrong);}
+.blank-word.revealed{background:#FFF9C4;color:#555;border-bottom-color:#aaa;font-style:italic;}
+
+/* QUIZ & CHOOSE BEST */
+.quiz-grid,.cb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;}
+.quiz-item,.cb-item{background:var(--off-white);border:1px solid var(--gold-light);border-radius:8px;padding:12px;}
+.quiz-item .q-num{font-size:.78em;color:var(--silver-dark);margin-bottom:4px;font-weight:bold;}
+.quiz-item .q-hint,.cb-hint{font-size:.88em;color:var(--text-dark);margin-bottom:8px;font-style:italic;line-height:1.4;font-weight:bold;}
+.quiz-opts,.cb-opts{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.quiz-opt,.cb-opt{padding:6px 8px;border:1px solid var(--gold-light);border-radius:6px;cursor:pointer;font-size:.83em;text-align:center;background:#fff;transition:all .15s;font-family:Georgia,serif;font-weight:bold;}
+.quiz-opt:hover,.cb-opt:hover{border-color:var(--gold-dark);background:var(--gold-light);}
+.quiz-opt.selected,.cb-opt.selected{border-color:var(--gold-dark);background:var(--gold-light);}
+.quiz-opt.correct,.cb-opt.correct{border-color:var(--correct);background:var(--correct-bg);color:var(--correct);}
+.quiz-opt.wrong,.cb-opt.wrong{border-color:var(--wrong);background:var(--wrong-bg);color:var(--wrong);}
+
+/* MISSING LETTERS */
+.ml-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;}
+.ml-item{background:var(--off-white);border:1px solid var(--gold-light);border-radius:8px;padding:10px;}
+.ml-item .ml-display{font-size:1.2em;font-weight:bold;letter-spacing:4px;color:var(--gold-dark);margin-bottom:5px;}
+.ml-item .ml-hint{font-size:.78em;color:var(--text-mid);margin-bottom:6px;font-style:italic;font-weight:bold;}
+.ml-item .ml-input-row{display:flex;gap:6px;align-items:center;}
+.ml-item input{width:52px;border:1px solid var(--gold-light);border-radius:4px;padding:4px 6px;font-size:1em;text-align:center;font-family:Georgia,serif;text-transform:uppercase;background:#fff;font-weight:bold;}
+.ml-item.correct{border-color:var(--correct);background:var(--correct-bg);}
+.ml-item.wrong{border-color:var(--wrong);background:var(--wrong-bg);}
+
+/* LETTER CODING */
+.lc-code-display{background:var(--off-white);border:2px solid var(--gold-light);border-radius:8px;padding:14px;margin-bottom:14px;font-family:'Courier New',monospace;}
+.lc-code-display .row{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:8px;align-items:center;}
+.lc-code-display .row .label{width:90px;font-size:.95em;color:var(--gold-dark);font-weight:bold;font-family:Georgia,serif;flex-shrink:0;}
+.lc-code-display .row span.alpha-cell{width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;font-size:1.05em;font-weight:bold;border:1px solid var(--gold-light);border-radius:4px;background:#fff;text-align:center;}
+.lc-code-display .row span.coded-cell{color:var(--accent-blue);background:#EEF3FF;border-color:var(--accent-blue);}
+.lc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;}
+.lc-item{background:var(--off-white);border:1px solid var(--gold-light);border-radius:8px;padding:10px;}
+.lc-item .lc-coded{font-size:1.1em;font-weight:bold;letter-spacing:3px;color:var(--accent-blue);font-family:'Courier New',monospace;margin-bottom:5px;}
+.lc-item .lc-hint{font-size:.78em;color:var(--text-mid);margin-bottom:6px;font-style:italic;font-weight:bold;}
+.lc-item input{width:100%;border:1px solid var(--gold-light);border-radius:4px;padding:5px 8px;font-size:.9em;font-family:Georgia,serif;background:#fff;text-transform:uppercase;font-weight:bold;}
+.lc-item.correct{border-color:var(--correct);background:var(--correct-bg);}
+.lc-item.wrong{border-color:var(--wrong);background:var(--wrong-bg);}
+
+@media(max-width:600px){
+  .cw-grid td{width:26px;height:26px;}
+  .quiz-opts,.cb-opts{grid-template-columns:1fr;}
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     LOADING SCREEN
+════════════════════════════════════════════ -->
+<div id="loading-screen">
+  <div class="loader-logo">🕉</div>
+  <div class="loader-title" id="loader-title">Festival Activities</div>
+  <div class="loader-sub">Loading your puzzles…</div>
+  <div class="loader-bar-wrap"><div class="loader-bar" id="loader-bar"></div></div>
+  <div class="loader-status" id="loader-status">Starting…</div>
+  <div class="loader-error" id="loader-error"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MAIN APP (hidden until load complete)
+════════════════════════════════════════════ -->
+<div id="app" style="display:none;">
+  <div id="header"></div>
+
+  <div id="nav">
+    <button class="nav-btn active" id="nb-crossword"  onclick="showSection('crossword',this)">📖 Crossword (0)</button>
+    <button class="nav-btn" id="nb-wordsearch" onclick="showSection('wordsearch',this)">🔍 Word Search (0)</button>
+    <button class="nav-btn" id="nb-jumbled"    onclick="showSection('jumbled',this)">🔀 Jumbled (0)</button>
+    <button class="nav-btn" id="nb-matchpairs" onclick="showSection('matchpairs',this)">🔗 Match Pairs (0)</button>
+    <button class="nav-btn" id="nb-fillblanks" onclick="showSection('fillblanks',this)">✏️ Fill Blanks (0)</button>
+    <button class="nav-btn" id="nb-quiz"       onclick="showSection('quiz',this)">❓ Quiz (0)</button>
+    <button class="nav-btn" id="nb-missing"    onclick="showSection('missing',this)">🔤 Missing Letters (0)</button>
+    <button class="nav-btn" id="nb-coding"     onclick="showSection('coding',this)">🔒 Letter Coding (0)</button>
+    <button class="nav-btn" id="nb-choose"     onclick="showSection('choose',this)">⭐ Choose Best (0)</button>
+    <button class="nav-btn regen-btn" onclick="confirmRegenerate()">🔄 Regenerate</button>
+    <button class="nav-btn pdf-btn" onclick="generatePDF(false)" title="Download puzzles as PDF">🖨️ Print Puzzles</button>
+    <button class="nav-btn pdf-btn ans-btn" onclick="generatePDF(true)" title="Download answer key as PDF">🗝️ Answer Key</button>
+    <span class="nav-total" id="sc-total">🏆 0</span>
+  </div>
+  <div id="crossword"  class="section active"><div class="section-title">📖 Crossword Puzzle</div>
+  <div class="section-instructions"><strong>How to play:</strong> Click any white cell to highlight a word. The selected word is shown in yellow.<br>Then click a word from the Word Bank above to fill it in automatically.</div><div id="cw-inner"></div></div>
+  <div id="wordsearch" class="section"><div class="section-title">🔍 Word Search</div>
+  <div class="section-instructions"><strong>How to play:</strong> Find the hidden words in the grid — they run horizontally, vertically, or diagonally.<br>Click each letter of a word one by one, then press <em>Check Answers</em> to confirm your selection.</div><div id="ws-inner"></div></div>
+  <div id="jumbled"    class="section"><div class="section-title">🔀 Jumbled Words</div>
+  <div class="section-instructions"><strong>How to play:</strong> Each card shows a scrambled word and a hint. Click a card to select it (it turns yellow).<br>Then click the correct word from the Word Bank above to fill in the answer.</div><div id="jw-inner"></div></div>
+  <div id="matchpairs" class="section"><div class="section-title">🔗 Match Pairs</div>
+  <div class="section-instructions"><strong>How to play:</strong> Each word has been split into two halves. Click one item on the left, then its matching half on the right.<br>A correct pair turns green instantly. A wrong pair flashes red briefly.</div><div id="mp-inner"></div></div>
+  <div id="fillblanks" class="section"><div class="section-title">✏️ Fill in the Blanks</div>
+  <div class="section-instructions"><strong>How to play:</strong> Click a word from the Word Bank (shown above each story) to select it — it will highlight.<br>Then click a blank (____) in the story to place the word there.</div><div id="fb-inner"></div></div>
+  <div id="quiz"       class="section"><div class="section-title">❓ Quiz</div>
+  <div class="section-instructions"><strong>How to play:</strong> Read the clue for each question and choose the best answer from the four options.<br>Press <em>Check Answers</em> to see your results. Correct answers turn green, wrong ones turn red.</div><div id="qz-inner"></div></div>
+  <div id="missing"    class="section"><div class="section-title">🔤 Missing Letters</div>
+  <div class="section-instructions"><strong>How to play:</strong> Each word has one or two letters missing (shown as _).<br>Type the missing letter(s) in the small box beside each word. Use the Word Bank as a hint for the full words.</div><div id="ml-inner"></div></div>
+  <div id="coding"     class="section"><div class="section-title">🔒 Letter Coding</div>
+  <div class="section-instructions"><strong>How to play:</strong> The table at the top shows a secret code — each letter of A–Z is replaced by a different letter.<br>Use the table to decode each coded word and type your answer in the box.</div><div id="lc-inner"></div></div>
+  <div id="choose"     class="section"><div class="section-title">⭐ Choose the Best Answer</div>
+  <div class="section-instructions"><strong>How to play:</strong> Read the description and choose the word it best describes from the four options given.<br>Press <em>Check Answers</em> when done — correct answers turn green, wrong ones turn red.</div><div id="cb-inner"></div></div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   ▶  FOUR GLOBAL CONFIG VARIABLES
+      Change these to switch festivals — everything else is automatic.
+════════════════════════════════════════════════════════════════ */
+const params = new URLSearchParams(window.location.search);
+const q = params.get("q");
+let FESTIVAL_NAME = "";
+FF = ["Festivals",
+"Cricket",
+"Gaurapoornima",
+"GitaJayanthi",
+"Hindu",
+"Janmashtami",
+"JhulanYatra",
+"Mahabharat",
+"Movies",
+"NarasimhaChaturtasi",
+"Politics",
+"Radhastami",
+"Ramanavami",
+"Ramayan"]
+FESTIVAL_NAME = ((q > "") ? FF[q] : FF[12]);
+
+const LOGOC = Math.floor(Math.random() * 4) + 1;
+let CONFIG_LOGO_URL="https://raw.githubusercontent.com/kumarpk108/kids/main/" + FESTIVAL_NAME + "/Logo" + LOGOC + ".jpg";
+let CONFIG_WORDS_URL = "https://raw.githubusercontent.com/kumarpk108/kids/main/" + FESTIVAL_NAME + "/Words.txt";
+let CONFIG_STORIES_URL = "https://raw.githubusercontent.com/kumarpk108/kids/main/" + FESTIVAL_NAME + "/Stories.txt";
+/* ═══════════════════════════════════════════════════════════════ */
+
+// Runtime data (filled after fetch)
+let WORDS_DATA   = [];
+let STORIES_DATA = [];
+
+// ─── Loading helpers ──────────────────────────────────────────
+function setProgress(pct, msg) {
+  document.getElementById('loader-bar').style.width = pct + '%';
+  document.getElementById('loader-status').textContent = msg;
+}
+function showLoadError(msg) {
+  const el = document.getElementById('loader-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+  document.getElementById('loader-status').textContent = 'Failed — see error above';
+}
+
+// ─── Parse words file (tab-delimited, skip header) ────────────
+function parseWords(text) {
+  return text.split('\n')
+    .slice(1)                         // skip header row
+    .map(l => l.trim())
+    .filter(l => l)
+    .map(l => {
+      const [word, ...rest] = l.split('\t');
+      return { word: word.trim(), hint: rest.join('\t').trim() };
+    })
+    .filter(r => r.word && r.hint);
+}
+
+// ─── Parse stories file (one story per non-empty line) ────────
+function parseStories(text) {
+  return text.split('\n').map(l => l.trim()).filter(l => l.length > 20);
+}
+
+// ─── Main boot sequence ───────────────────────────────────────
+async function boot() {
+  try {
+    // 1. Load logo (non-blocking — show app even if logo fails)
+    setProgress(10, 'Loading logo…');
+    try {
+      const img = new Image();
+      img.src = CONFIG_LOGO_URL;
+      // Set header immediately — browser streams the image
+      document.getElementById('header').innerHTML =
+        `<img src="${CONFIG_LOGO_URL}" alt="Sri Ramanavami"
+              onerror="this.parentElement.innerHTML='<div class=\\'logo-fallback\\'>🕉 Sri Ramanavami — Activities for Young Learners</div>'">`;
+    } catch(e) {
+      document.getElementById('header').innerHTML =
+        '<div class="logo-fallback">🕉 Sri Ramanavami — Activities for Young Learners</div>';
+    }
+
+    // 2. Fetch words file
+    setProgress(30, 'Loading words data…');
+    const wordsResp = await fetch(CONFIG_WORDS_URL);
+    if (!wordsResp.ok) throw new Error(`Words file: HTTP ${wordsResp.status}`);
+    const wordsText = await wordsResp.text();
+    WORDS_DATA = parseWords(wordsText);
+    if (WORDS_DATA.length < 10) throw new Error(`Words file parsed only ${WORDS_DATA.length} entries — check format`);
+    setProgress(60, `Loaded ${WORDS_DATA.length} words…`);
+
+    // 3. Fetch stories file
+    setProgress(65, 'Loading stories data…');
+    const storiesResp = await fetch(CONFIG_STORIES_URL);
+    if (!storiesResp.ok) throw new Error(`Stories file: HTTP ${storiesResp.status}`);
+    const storiesText = await storiesResp.text();
+    STORIES_DATA = parseStories(storiesText);
+    if (STORIES_DATA.length < 5) throw new Error(`Stories file parsed only ${STORIES_DATA.length} entries — check format`);
+    setProgress(85, `Loaded ${STORIES_DATA.length} stories…`);
+
+    // 4. Build all sections
+    setProgress(90, 'Building puzzles…');
+    buildAll();
+    setProgress(100, 'Ready!');
+
+    // 5. Reveal app, hide loader
+    setTimeout(() => {
+      document.getElementById('app').style.display = 'block';
+      const ls = document.getElementById('loading-screen');
+      ls.classList.add('hidden');
+      setTimeout(() => ls.style.display = 'none', 500);
+    }, 400);
+
+  } catch(err) {
+    showLoadError('⚠ ' + err.message + '\n\nTip: Make sure the GitHub files are publicly accessible and CORS is allowed (raw.githubusercontent.com is fine).');
+    console.error(err);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+//  UTILITIES
+// ─────────────────────────────────────────────────────────────
+const scores = {crossword:0,wordsearch:0,jumbled:0,matchpairs:0,fillblanks:0,quiz:0,missing:0,coding:0,choose:0};
+const BTN_LABELS = {
+  crossword:'📖 Crossword', wordsearch:'🔍 Word Search', jumbled:'🔀 Jumbled',
+  matchpairs:'🔗 Match Pairs', fillblanks:'✏️ Fill Blanks', quiz:'❓ Quiz',
+  missing:'🔤 Missing Letters', coding:'🔒 Letter Coding', choose:'⭐ Choose Best'
+};
+function updateScore(s,v,m){
+  scores[s]=v;
+  const btn=document.getElementById('nb-'+s);
+  if(btn){
+    const scoreStr = m ? `(${v}/${m})` : `(${v})`;
+    btn.textContent = BTN_LABELS[s] + ' ' + scoreStr;
+  }
+  const total=Object.values(scores).reduce((a,b)=>a+b,0);
+  const tot=document.getElementById('sc-total');
+  if(tot)tot.textContent='🏆 '+total;
+}
+function seededRand(seed){let s=seed;return()=>{s=(s*9301+49297)%233280;return s/233280;};}
+let globalSeed=Date.now();
+function pickRandom(arr,n,seed){
+  const r=seededRand(seed||globalSeed),copy=[...arr],res=[];
+  while(res.length<n&&copy.length>0){const i=Math.floor(r()*copy.length);res.push(copy.splice(i,1)[0]);}
+  return res;
+}
+function shuffle(arr,seed){
+  const r=seededRand(seed||globalSeed+1),a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+function showSection(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(btn)btn.classList.add('active');
+}
+function confirmRegenerate(){
+  if(confirm('Regenerate all puzzles with new random data? This will reset all answers.')){
+    globalSeed=Date.now();buildAll();
+  }
+}
+function btnRow(checkFn,revealFn){
+  return `<div class="btn-row">
+    <button class="check-btn" onclick="${checkFn}">✅ Check Answers</button>
+    <button class="reveal-btn" onclick="${revealFn}">💡 Reveal Answers</button>
+  </div>`;
+}
+function sortedBank(words){return[...words].sort((a,b)=>a.localeCompare(b));}
+function bankHTML(words,clickFn,idPrefix){
+  const sb=sortedBank(words);
+  return `<div class="wordbank" id="${idPrefix}-bank">
+    <strong>📚 Word Bank (A–Z):</strong><br>
+    ${sb.map(w=>`<span class="bank-clickable" data-bword="${w}" onclick="${clickFn}('${w.replace(/'/g,"\\'")}') ">${w}</span>`).join('')}
+  </div>`;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CROSSWORD
+───────────────────────────────────────────────────────────── */
+let cwClues=[];
+function buildCrossword(){
+  const words=pickRandom(WORDS_DATA.filter(w=>w.word.length>=3&&w.word.length<=12),10,globalSeed+100);
+  const SIZE=20;let grid=Array.from({length:SIZE},()=>Array(SIZE).fill(null));let placed=[];
+  function canPlace(word,r,c,dir){
+    for(let i=0;i<word.length;i++){
+      let rr=r+(dir==='down'?i:0),cc=c+(dir==='across'?i:0);
+      if(rr<0||rr>=SIZE||cc<0||cc>=SIZE)return false;
+      if(grid[rr][cc]!==null&&grid[rr][cc]!==word[i])return false;
+      if(grid[rr][cc]===null){
+        if(dir==='across'){if(rr>0&&grid[rr-1][cc]!==null)return false;if(rr<SIZE-1&&grid[rr+1][cc]!==null)return false;}
+        else{if(cc>0&&grid[rr][cc-1]!==null)return false;if(cc<SIZE-1&&grid[rr][cc+1]!==null)return false;}
+      }
+    }
+    if(dir==='across'){if(c>0&&grid[r][c-1]!==null)return false;if(c+word.length<SIZE&&grid[r][c+word.length]!==null)return false;}
+    else{if(r>0&&grid[r-1][c]!==null)return false;if(r+word.length<SIZE&&grid[r+word.length]&&grid[r+word.length][c]!==null)return false;}
+    return true;
+  }
+  function placeWord(word,r,c,dir){
+    for(let i=0;i<word.length;i++){let rr=r+(dir==='down'?i:0),cc=c+(dir==='across'?i:0);grid[rr][cc]=word[i];}
+    placed.push({word,r,c,dir});
+  }
+  const first=words[0].word.toUpperCase();
+  placeWord(first,Math.floor(SIZE/2),Math.floor((SIZE-first.length)/2),'across');
+  for(let wi=1;wi<words.length;wi++){
+    const w=words[wi].word.toUpperCase();let bS=-1,bR,bC,bD;
+    for(const p of placed){const pw=p.word.toUpperCase();
+      for(let pi=0;pi<pw.length;pi++)for(let wi2=0;wi2<w.length;wi2++){
+        if(pw[pi]===w[wi2]){
+          if(p.dir==='across'){const r=p.r-wi2,c=p.c+pi;if(canPlace(w,r,c,'down')&&wi2>bS){bS=wi2;bR=r;bC=c;bD='down';}}
+          else{const r=p.r+pi,c=p.c-wi2;if(canPlace(w,r,c,'across')&&wi2>bS){bS=wi2;bR=r;bC=c;bD='across';}}
+        }
+      }
+    }
+    if(bS>=0)placeWord(w,bR,bC,bD);
+  }
+  let minR=SIZE,maxR=0,minC=SIZE,maxC=0;
+  for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++){if(grid[r][c]!==null){minR=Math.min(minR,r);maxR=Math.max(maxR,r);minC=Math.min(minC,c);maxC=Math.max(maxC,c);}}
+  minR=Math.max(0,minR-1);maxR=Math.min(SIZE-1,maxR+1);minC=Math.max(0,minC-1);maxC=Math.min(SIZE-1,maxC+1);
+  let num=1;const cellNums={};
+  for(let r=minR;r<=maxR;r++)for(let c=minC;c<=maxC;c++){
+    if(grid[r][c]!==null){
+      const sA=(c===minC||grid[r][c-1]===null)&&c+1<=maxC&&grid[r][c+1]!==null;
+      const sD=(r===minR||grid[r-1][c]===null)&&r+1<=maxR&&grid[r+1]&&grid[r+1][c]!==null;
+      if(sA||sD)cellNums[r+','+c]=num++;
+    }
+  }
+  cwClues=[];
+  for(const p of placed){const key=p.r+','+p.c,n=cellNums[key];
+    if(n!==undefined){const wobj=words.find(w=>w.word.toUpperCase()===p.word);cwClues.push({n,dir:p.dir,word:p.word,hint:wobj?wobj.hint:'',r:p.r,c:p.c});}
+  }
+  cwClues.sort((a,b)=>a.n-b.n||(a.dir==='across'?-1:1));
+  let tableHTML='<div id="cw-container"><table class="cw-grid" id="cw-table">';
+  for(let r=minR;r<=maxR;r++){tableHTML+='<tr>';
+    for(let c=minC;c<=maxC;c++){const ch=grid[r][c],key=r+','+c;
+      if(ch===null)tableHTML+='<td class="black"></td>';
+      else{const n=cellNums[key];tableHTML+=`<td class="white" data-r="${r}" data-c="${c}" data-ans="${ch}">`;if(n)tableHTML+=`<span class="cell-num">${n}</span>`;tableHTML+=`<input type="text" maxlength="1" readonly onclick="cwCellClick(this.parentElement)"></td>`;}
+    }tableHTML+='</tr>';
+  }tableHTML+='</table></div>';
+  const ac=cwClues.filter(c=>c.dir==='across'),dc=cwClues.filter(c=>c.dir==='down');
+  let acH='<div class="cw-clues-col"><h4>ACROSS</h4><ol>';ac.forEach(cl=>{acH+=`<li value="${cl.n}">${cl.n}. ${cl.hint}</li>`;});acH+='</ol></div>';
+  let dcH='<div class="cw-clues-col"><h4>DOWN</h4><ol>';dc.forEach(cl=>{dcH+=`<li value="${cl.n}">${cl.n}. ${cl.hint}</li>`;});dcH+='</ol></div>';
+  const totalAns=placed.reduce((s,p)=>s+p.word.length,0);
+  let revAc='',revDc='';
+  ac.forEach(cl=>{revAc+=`<tr><td style="font-weight:bold">${cl.n} Across</td><td class="reveal-answer">${cl.word}</td><td>${cl.hint}</td></tr>`;});
+  dc.forEach(cl=>{revDc+=`<tr><td style="font-weight:bold">${cl.n} Down</td><td class="reveal-answer">${cl.word}</td><td>${cl.hint}</td></tr>`;});
+  document.getElementById('cw-inner').innerHTML=
+    bankHTML(words.map(w=>w.word),'cwBankClick','cw')+tableHTML+
+    `<div class="cw-clues">${acH}${dcH}</div>`+
+    btnRow(`checkCrossword(${totalAns})`,'revealCrossword()')+
+    `<div class="section-score" id="cw-score" style="display:none"></div>`+
+    `<div class="reveal-panel" id="cw-reveal"><h4>💡 Answers</h4><table class="reveal-table"><tr><th>Clue</th><th>Answer</th><th>Hint</th></tr>${revAc}${revDc}</table></div>`;
+}
+let cwActiveClue=null;
+function cwCellClick(td){
+  const r=parseInt(td.getAttribute('data-r')),c=parseInt(td.getAttribute('data-c'));
+  const matching=cwClues.filter(cl=>{
+    if(cl.dir==='across')return cl.r===r&&c>=cl.c&&c<cl.c+cl.word.length;
+    else return cl.c===c&&r>=cl.r&&r<cl.r+cl.word.length;
+  });
+  if(!matching.length)return;
+  let chosen=matching[0];
+  if(cwActiveClue&&matching.length>1&&cwActiveClue.n===matching[0].n&&cwActiveClue.dir===matching[0].dir)chosen=matching[1]||matching[0];
+  document.querySelectorAll('.cw-grid td.active-cw').forEach(t=>t.classList.remove('active-cw'));
+  cwActiveClue=chosen;
+  const table=document.getElementById('cw-table');if(!table)return;
+  for(let i=0;i<chosen.word.length;i++){
+    const rr=chosen.r+(chosen.dir==='down'?i:0),cc=chosen.c+(chosen.dir==='across'?i:0);
+    const t=table.querySelector(`td[data-r="${rr}"][data-c="${cc}"]`);if(t)t.classList.add('active-cw');
+  }
+}
+function cwBankClick(word){
+  if(!cwActiveClue){alert('Please click a cell in the crossword grid first to select a clue.');return;}
+  const w=word.toUpperCase();
+  if(w.length!==cwActiveClue.word.length){alert(`"${word}" has ${w.length} letters but the selected clue needs ${cwActiveClue.word.length} letters.`);return;}
+  const table=document.getElementById('cw-table');
+  for(let i=0;i<w.length;i++){
+    const rr=cwActiveClue.r+(cwActiveClue.dir==='down'?i:0),cc=cwActiveClue.c+(cwActiveClue.dir==='across'?i:0);
+    const td=table.querySelector(`td[data-r="${rr}"][data-c="${cc}"]`);
+    if(td){const inp=td.querySelector('input');if(inp)inp.value=w[i];}
+  }
+  const bEl=document.querySelector(`#cw-bank [data-bword="${word}"]`);if(bEl)bEl.classList.add('used');
+  cwActiveClue=null;
+  document.querySelectorAll('.cw-grid td.active-cw').forEach(t=>t.classList.remove('active-cw'));
+}
+function checkCrossword(total){
+  let correct=0;
+  document.querySelectorAll('#cw-inner td.white').forEach(td=>{
+    const inp=td.querySelector('input');if(!inp)return;
+    const ans=td.getAttribute('data-ans'),val=inp.value.toUpperCase();
+    td.classList.remove('correct','wrong');
+    if(val){if(val===ans){td.classList.add('correct');correct++;}else td.classList.add('wrong');}
+  });
+  const sc=document.getElementById('cw-score');sc.style.display='block';sc.textContent=`Score: ${correct}/${total} correct cells`;updateScore('crossword',correct,total);
+}
+function revealCrossword(){
+  document.querySelectorAll('#cw-inner td.white').forEach(td=>{
+    const inp=td.querySelector('input');if(!inp)return;
+    if(!td.classList.contains('correct')){inp.value=td.getAttribute('data-ans');td.classList.add('revealed');td.classList.remove('wrong');}
+  });
+  document.getElementById('cw-reveal').classList.add('show');
+}
+
+/* ─────────────────────────────────────────────────────────────
+   WORD SEARCH — responsive cell size
+───────────────────────────────────────────────────────────── */
+function calcWsCellSize(cols){
+  const avail = Math.min(document.getElementById('ws-inner').offsetWidth || window.innerWidth, window.innerWidth) - 32;
+  const gap = (cols-1)*2;
+  const cell = Math.max(26, Math.min(40, Math.floor((avail - gap) / cols)));
+  const fontSize = cell >= 36 ? '1em' : cell >= 30 ? '.88em' : '.75em';
+  document.documentElement.style.setProperty('--ws-cell', cell+'px');
+  document.documentElement.style.setProperty('--ws-font', fontSize);
+  return cell;
+}
+function buildWordSearch(){
+  const ROWS=12,COLS=12;
+  const wsWords=pickRandom(WORDS_DATA.filter(w=>w.word.length<=10&&w.word.length>=3),12,globalSeed+200);
+  const board=Array.from({length:ROWS},()=>Array(COLS).fill(''));
+  const DIRS=[[0,1],[1,0],[1,1],[1,-1]];const placed=[];
+  function tryPlace(word,seed2){
+    const r=seededRand(seed2);
+    for(let a=0;a<300;a++){
+      const [dr,dc]=DIRS[Math.floor(r()*DIRS.length)];
+      const sR=Math.floor(r()*ROWS),sC=Math.floor(r()*COLS);
+      let ok=true;const cells=[];
+      for(let i=0;i<word.length;i++){const rr=sR+dr*i,cc=sC+dc*i;if(rr<0||rr>=ROWS||cc<0||cc>=COLS){ok=false;break;}if(board[rr][cc]&&board[rr][cc]!==word[i]){ok=false;break;}cells.push([rr,cc]);}
+      if(ok){cells.forEach(([rr,cc],i)=>board[rr][cc]=word[i]);placed.push({word,cells});return true;}
+    }return false;
+  }
+  const alpha='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  wsWords.forEach((w,i)=>tryPlace(w.word.toUpperCase(),globalSeed+200+i));
+  const r2=seededRand(globalSeed+300);
+  for(let i=0;i<ROWS;i++)for(let j=0;j<COLS;j++){if(!board[i][j])board[i][j]=alpha[Math.floor(r2()*26)];}
+  let gridHTML='<div class="ws-grid-wrap"><div id="ws-grid">';
+  for(let i=0;i<ROWS;i++){gridHTML+='<div class="ws-row">';for(let j=0;j<COLS;j++){gridHTML+=`<div class="ws-cell" data-r="${i}" data-c="${j}" onclick="wsClick(this)">${board[i][j]}</div>`;}gridHTML+='</div>';}
+  gridHTML+='</div></div>';
+  const placedWords=placed.map(p=>p.word);
+  let wlistHTML='<div class="ws-word-list">';placedWords.forEach(w=>{wlistHTML+=`<div class="ws-word-item" id="wsw-${w}">${w}</div>`;});wlistHTML+='</div>';
+  const placedData=placed.map(p=>{
+    const dr=p.cells.length>1?p.cells[1][0]-p.cells[0][0]:0,dc=p.cells.length>1?p.cells[1][1]-p.cells[0][1]:0;
+    const dirStr=dr===0&&dc===1?'→ Horizontal':dr===1&&dc===0?'↓ Vertical':dr===1&&dc===1?'↘ Diagonal':'↙ Diagonal';
+    return{word:p.word,key:p.cells.map(([r,c])=>r+','+c).join('|'),cells:p.cells,dirStr};
+  });
+  let revRows='';placedData.forEach(p=>{revRows+=`<tr><td class="reveal-answer">${p.word}</td><td>Row ${p.cells[0][0]+1}, Col ${p.cells[0][1]+1}</td><td>${p.dirStr}</td></tr>`;});
+  const sb=sortedBank(placedWords);
+  document.getElementById('ws-inner').innerHTML=
+    `<div class="wordbank"><strong>📚 Words to Find (A–Z):</strong> ${sb.map(w=>`<span>${w}</span>`).join(' &nbsp;·&nbsp; ')}</div>`+
+    gridHTML+wlistHTML+btnRow('checkWordSearch()','revealWordSearch()')+
+    `<div class="section-score" id="ws-score" style="display:none"></div>`+
+    `<div class="reveal-panel" id="ws-reveal"><h4>💡 Word Locations</h4><table class="reveal-table"><tr><th>Word</th><th>Starts At</th><th>Direction</th></tr>${revRows}</table></div>`;
+  document.getElementById('ws-inner').setAttribute('data-placed',JSON.stringify(placedData));
+  window.wsSelected=[];window.wsFoundWords=new Set();
+  // Calculate responsive cell size after DOM is ready
+  setTimeout(()=>calcWsCellSize(COLS), 0);
+  window.addEventListener('resize',()=>calcWsCellSize(COLS));
+}
+function wsClick(cell){
+  const r=cell.getAttribute('data-r'),c=cell.getAttribute('data-c'),key=r+','+c;
+  if(cell.classList.contains('found'))return;
+  if(cell.classList.contains('selected')){cell.classList.remove('selected');window.wsSelected=window.wsSelected.filter(k=>k!==key);}
+  else{cell.classList.add('selected');window.wsSelected.push(key);}
+}
+function checkWordSearch(){
+  const placed=JSON.parse(document.getElementById('ws-inner').getAttribute('data-placed'));
+  placed.forEach(p=>{
+    if(window.wsFoundWords.has(p.word))return;
+    const sel=new Set(window.wsSelected);
+    if(p.key.split('|').every(k=>sel.has(k))){
+      window.wsFoundWords.add(p.word);
+      p.key.split('|').forEach(k=>{const[r,c]=k.split(',');const el=document.querySelector(`.ws-cell[data-r="${r}"][data-c="${c}"]`);if(el){el.classList.remove('selected');el.classList.add('found');}});
+      const wl=document.getElementById('wsw-'+p.word);if(wl)wl.classList.add('found-word');
+    }
+  });
+  document.querySelectorAll('.ws-cell.selected').forEach(el=>el.classList.remove('selected'));window.wsSelected=[];
+  const sc=document.getElementById('ws-score');sc.style.display='block';sc.textContent=`Found: ${window.wsFoundWords.size}/${placed.length} words`;updateScore('wordsearch',window.wsFoundWords.size,placed.length);
+}
+function revealWordSearch(){
+  const placed=JSON.parse(document.getElementById('ws-inner').getAttribute('data-placed'));
+  placed.forEach(p=>{if(!window.wsFoundWords.has(p.word)){p.key.split('|').forEach(k=>{const[r,c]=k.split(',');const el=document.querySelector(`.ws-cell[data-r="${r}"][data-c="${c}"]`);if(el){el.classList.add('found');el.classList.remove('selected');}});const wl=document.getElementById('wsw-'+p.word);if(wl)wl.classList.add('found-word');window.wsFoundWords.add(p.word);}});
+  document.getElementById('ws-reveal').classList.add('show');
+}
+
+/* ─────────────────────────────────────────────────────────────
+   JUMBLED WORDS
+───────────────────────────────────────────────────────────── */
+let jwFocusedIdx=null;
+function buildJumbled(){
+  const jwords=pickRandom(WORDS_DATA,20,globalSeed+400);
+  const r=seededRand(globalSeed+401);
+  function jumble(w){const arr=w.split('');for(let i=arr.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}const jd=arr.join('');return jd===w&&w.length>1?jumble(w):jd;}
+  let html=bankHTML(jwords.map(w=>w.word),'jwBankClick','jw').replace('📚 Word Bank (A–Z):','📚 Word Bank (A–Z) — click a question, then click a word to fill it:');
+  html+='<div class="jumble-grid">';
+  let revRows='';
+  jwords.forEach((w,i)=>{
+    const j=jumble(w.word.toUpperCase());
+    html+=`<div class="jumble-item" id="ji-${i}" data-ans="${w.word.toUpperCase()}" onclick="jwFocus(${i},event)">
+      <div class="jumbled">${j}</div><div class="hint">${w.hint}</div>
+      <div class="jw-answer" id="ja-${i}">&nbsp;</div>
+      <div class="click-hint">👆 Click here, then click a word from the bank above</div></div>`;
+    revRows+=`<tr><td>Q${i+1}</td><td class="reveal-answer">${w.word}</td><td>${w.hint}</td></tr>`;
+  });
+  html+=`</div>${btnRow(`checkJumbled(${jwords.length})`,'revealJumbled()')}<div class="section-score" id="jw-score" style="display:none"></div><div class="reveal-panel" id="jw-reveal"><h4>💡 Answers</h4><table class="reveal-table"><tr><th>#</th><th>Answer</th><th>Hint</th></tr>${revRows}</table></div>`;
+  document.getElementById('jw-inner').innerHTML=html;jwFocusedIdx=null;
+}
+function jwFocus(idx,evt){evt&&evt.stopPropagation();document.querySelectorAll('.jumble-item').forEach(el=>el.classList.remove('focused-jw'));if(jwFocusedIdx===idx){jwFocusedIdx=null;return;}jwFocusedIdx=idx;const el=document.getElementById('ji-'+idx);if(el)el.classList.add('focused-jw');}
+function jwBankClick(word){
+  if(jwFocusedIdx===null){alert('Please click a question first, then click a word from the bank.');return;}
+  const item=document.getElementById('ji-'+jwFocusedIdx);if(!item||item.classList.contains('correct'))return;
+  const disp=document.getElementById('ja-'+jwFocusedIdx);if(disp)disp.textContent=word.toUpperCase();
+  item.setAttribute('data-filled',word.toUpperCase());item.classList.remove('focused-jw');jwFocusedIdx=null;
+}
+function checkJumbled(total){
+  let correct=0;for(let i=0;i<total;i++){const item=document.getElementById('ji-'+i);const ans=item.getAttribute('data-ans');const filled=(item.getAttribute('data-filled')||'').toUpperCase();item.classList.remove('correct','wrong');if(filled===ans){item.classList.add('correct');correct++;}else if(filled)item.classList.add('wrong');}
+  const sc=document.getElementById('jw-score');sc.style.display='block';sc.textContent=`Score: ${correct}/${total}`;updateScore('jumbled',correct,total);
+}
+function revealJumbled(){
+  document.querySelectorAll('#jw-inner .jumble-item').forEach(item=>{const ans=item.getAttribute('data-ans');if(!item.classList.contains('correct')){const disp=item.querySelector('.jw-answer');if(disp)disp.textContent=ans;item.setAttribute('data-filled',ans);item.classList.add('wrong');}});
+  document.getElementById('jw-reveal').classList.add('show');
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MATCH PAIRS
+───────────────────────────────────────────────────────────── */
+function buildMatchPairs(){
+  const mpwords=pickRandom(WORDS_DATA.filter(w=>w.word.length>=4),20,globalSeed+500);
+  function splitWord(word){const pos=Math.max(2,Math.min(word.length-2,Math.floor(word.length*.5)));return[word.slice(0,pos),word.slice(pos)];}
+  const pairs=mpwords.map((w,i)=>{const[l,r]=splitWord(w.word);return{id:i,left:l,right:r,word:w.word};});
+  const lItems=shuffle([...pairs],globalSeed+501),rItems=shuffle([...pairs],globalSeed+502);
+  const sb=sortedBank(pairs.map(p=>p.word));
+  let html=`<div class="wordbank"><strong>📚 Word Bank (A–Z):</strong> ${sb.map(w=>`<span>${w}</span>`).join(' &nbsp;·&nbsp; ')}</div>`;
+  html+=`<div class="match-container"><div class="match-col"><h4>First Half</h4>`;
+  lItems.forEach(p=>{html+=`<div class="match-item" id="ml-${p.id}" data-id="${p.id}" data-side="left" onclick="mpClick(this)">${p.left}</div>`;});
+  html+=`</div><div class="match-col"><h4>Second Half</h4>`;
+  rItems.forEach(p=>{html+=`<div class="match-item" id="mr-${p.id}" data-id="${p.id}" data-side="right" onclick="mpClick(this)">${p.right}</div>`;});
+  html+=`</div></div>`;
+  let revRows='';pairs.forEach(p=>{revRows+=`<tr><td class="reveal-answer">${p.left}</td><td class="reveal-answer">${p.right}</td><td style="font-weight:bold">${p.word}</td></tr>`;});
+  html+=btnRow(`checkMatchPairs(${pairs.length})`,'revealMatchPairs()')+`<div class="section-score" id="mp-score" style="display:none"></div><div class="reveal-panel" id="mp-reveal"><h4>💡 Correct Pairs</h4><table class="reveal-table"><tr><th>First Half</th><th>Second Half</th><th>Full Word</th></tr>${revRows}</table></div>`;
+  document.getElementById('mp-inner').innerHTML=html;
+  window.mpSelected={left:null,right:null};window.mpMatches={};window.mpPairs=pairs;
+}
+function mpClick(el){
+  if(el.classList.contains('matched'))return;
+  const side=el.getAttribute('data-side'),id=el.getAttribute('data-id');
+  if(window.mpSelected[side])document.querySelectorAll(`.match-item[data-side="${side}"]`).forEach(e=>e.classList.remove('selected','wrong-match'));
+  el.classList.add('selected');window.mpSelected[side]=id;
+  if(window.mpSelected.left!==null&&window.mpSelected.right!==null){
+    const lId=window.mpSelected.left,rId=window.mpSelected.right;
+    const lEl=document.querySelector(`.match-item[data-side="left"][data-id="${lId}"]`);
+    const rEl=document.querySelector(`.match-item[data-side="right"][data-id="${rId}"]`);
+    if(lId===rId){lEl.classList.remove('selected');lEl.classList.add('matched');rEl.classList.remove('selected');rEl.classList.add('matched');window.mpMatches[lId]=true;}
+    else{lEl.classList.add('wrong-match');rEl.classList.add('wrong-match');setTimeout(()=>{lEl.classList.remove('wrong-match','selected');rEl.classList.remove('wrong-match','selected');},800);}
+    window.mpSelected={left:null,right:null};
+  }
+}
+function checkMatchPairs(total){const c=Object.keys(window.mpMatches).length;const sc=document.getElementById('mp-score');sc.style.display='block';sc.textContent=`Matched: ${c}/${total} pairs`;updateScore('matchpairs',c,total);}
+function revealMatchPairs(){window.mpPairs&&window.mpPairs.forEach(p=>{if(!window.mpMatches[p.id]){const l=document.getElementById('ml-'+p.id),r=document.getElementById('mr-'+p.id);if(l){l.classList.add('matched');l.classList.remove('selected','wrong-match');}if(r){r.classList.add('matched');r.classList.remove('selected','wrong-match');}window.mpMatches[p.id]=true;}});document.getElementById('mp-reveal').classList.add('show');}
+
+/* ─────────────────────────────────────────────────────────────
+   FILL IN THE BLANKS (per-story word banks)
+───────────────────────────────────────────────────────────── */
+function buildFillBlanks(){
+  const fbstories=pickRandom(STORIES_DATA,5,globalSeed+600);
+  window.fbSelected={story:null,word:null};window.fbBlanks={};
+  const stopWords=new Set(['the','a','an','and','or','but','in','on','at','to','of','is','was','he','she','it','his','her','that','this','with','for','as','by','from','were','are','had','have','has','be','not','i','they','their','them','its','who','what','when','how']);
+  let allHTML='';let allRevRows='';
+  fbstories.forEach((story,si)=>{
+    const words=story.split(/\s+/);
+    const candidates=words.map((w,wi)=>{const clean=w.replace(/[^a-zA-Z]/g,'');return{wi,clean,orig:w};}).filter(x=>x.clean.length>=4&&!stopWords.has(x.clean.toLowerCase()));
+    const toBlank=pickRandom(candidates,Math.min(8,candidates.length),globalSeed+600+si);
+    const blankSet=new Set(toBlank.map(x=>x.wi));
+    window.fbBlanks[si]=toBlank.map(x=>x.clean.toUpperCase());
+    const storyBank=sortedBank(toBlank.map(x=>x.clean));
+    let bankH=`<div class="fitb-story-wordbank"><strong>📚 Word Bank for Story ${si+1} (A–Z):</strong><br>${storyBank.map(w=>{const wu=w.toUpperCase();return`<span class="fitb-bank-word" id="fbw-${si}-${wu}" data-story="${si}" data-word="${wu}" onclick="selectFBWord(${si},'${wu}')">${w}</span>`;}).join('')}</div>`;
+    let storyHTML='';
+    words.forEach((w,wi)=>{if(blankSet.has(wi)){const clean=w.replace(/[^a-zA-Z]/g,'').toUpperCase();storyHTML+=`<span class="blank-word" id="fb-${si}-${wi}" data-story="${si}" data-wi="${wi}" data-ans="${clean}" onclick="fillBlank(${si},${wi})">____</span> `;}else storyHTML+=w+' ';});
+    (window.fbBlanks[si]||[]).forEach(w=>{allRevRows+=`<tr><td>Story ${si+1}</td><td class="reveal-answer">${w}</td></tr>`;});
+    allHTML+=`<div class="fitb-story-block"><div class="story-num">Story ${si+1}</div>${bankH}<p class="fitb-story-text">${storyHTML}</p></div>`;
+  });
+  document.getElementById('fb-inner').innerHTML=allHTML+btnRow('checkFillBlanks()','revealFillBlanks()')+`<div class="section-score" id="fb-score" style="display:none"></div><div class="reveal-panel" id="fb-reveal"><h4>💡 Missing Words</h4><table class="reveal-table"><tr><th>Story</th><th>Missing Word</th></tr>${allRevRows}</table></div>`;
+}
+function selectFBWord(si,word){document.querySelectorAll('.fitb-bank-word.selected').forEach(e=>e.classList.remove('selected'));window.fbSelected={story:si,word};const el=document.getElementById(`fbw-${si}-${word}`);if(el)el.classList.add('selected');}
+function fillBlank(si,wi){
+  if(window.fbSelected.story===null){alert('Please click a word from the Word Bank first.');return;}
+  const word=window.fbSelected.word,el=document.getElementById(`fb-${si}-${wi}`);if(!el)return;
+  const prev=el.getAttribute('data-filled');if(prev){const prevEl=document.getElementById(`fbw-${si}-${prev}`);if(prevEl)prevEl.classList.remove('used');}
+  el.textContent=word;el.classList.add('filled');el.setAttribute('data-filled',word);
+  const bEl=document.getElementById(`fbw-${si}-${word}`);if(bEl){bEl.classList.add('used');bEl.classList.remove('selected');}
+  window.fbSelected={story:null,word:null};
+}
+function checkFillBlanks(){let correct=0,total=0;document.querySelectorAll('.blank-word').forEach(el=>{total++;const ans=el.getAttribute('data-ans'),filled=(el.getAttribute('data-filled')||'').toUpperCase();el.classList.remove('correct','wrong');if(filled===ans){el.classList.add('correct');correct++;}else if(filled)el.classList.add('wrong');});const sc=document.getElementById('fb-score');sc.style.display='block';sc.textContent=`Score: ${correct}/${total}`;updateScore('fillblanks',correct,total);}
+function revealFillBlanks(){document.querySelectorAll('.blank-word').forEach(el=>{const ans=el.getAttribute('data-ans');if(!el.classList.contains('correct')){el.textContent=ans;el.classList.add('revealed');el.classList.remove('wrong');el.setAttribute('data-filled',ans);}});document.getElementById('fb-reveal').classList.add('show');}
+
+/* ─────────────────────────────────────────────────────────────
+   QUIZ
+───────────────────────────────────────────────────────────── */
+function buildQuiz(){
+  const qwords=pickRandom(WORDS_DATA,20,globalSeed+700);
+  const allW=WORDS_DATA.map(w=>w.word),r=seededRand(globalSeed+701);
+  const sb=sortedBank(qwords.map(w=>w.word));
+  let html=`<div class="wordbank"><strong>📚 Word Bank (A–Z):</strong> ${sb.map(w=>`<span>${w}</span>`).join(' &nbsp;·&nbsp; ')}</div><div class="quiz-grid">`;
+  let revRows='';
+  qwords.forEach((w,i)=>{
+    const wrong=[],used=new Set([w.word]);while(wrong.length<3){const c=allW[Math.floor(r()*allW.length)];if(!used.has(c)){wrong.push(c);used.add(c);}}
+    const opts=shuffle([w.word,...wrong],globalSeed+700+i);
+    html+=`<div class="quiz-item" id="qi-${i}" data-correct="${w.word}"><div class="q-num">Q${i+1}</div><div class="q-hint">${w.hint}</div><div class="quiz-opts">`;
+    opts.forEach((opt,oi)=>{html+=`<div class="quiz-opt" id="qo-${i}-${oi}" onclick="selectQuizOpt(${i},${oi},this,'${opt.replace(/'/g,"\\'")}','${w.word.replace(/'/g,"\\'")}' )">${opt}</div>`;});
+    html+=`</div></div>`;revRows+=`<tr><td>Q${i+1}</td><td class="reveal-answer">${w.word}</td><td>${w.hint}</td></tr>`;
+  });
+  html+=`</div>${btnRow(`checkQuiz(${qwords.length})`,'revealQuiz()')}<div class="section-score" id="qz-score" style="display:none"></div><div class="reveal-panel" id="qz-reveal"><h4>💡 Correct Answers</h4><table class="reveal-table"><tr><th>Q</th><th>Answer</th><th>Hint</th></tr>${revRows}</table></div>`;
+  document.getElementById('qz-inner').innerHTML=html;window.qzAnswers={};
+}
+function selectQuizOpt(qi,oi,el,opt,correct){document.querySelectorAll(`#qi-${qi} .quiz-opt`).forEach(e=>e.classList.remove('selected'));el.classList.add('selected');window.qzAnswers[qi]={opt,correct,el};}
+function checkQuiz(total){let correct=0;for(let i=0;i<total;i++){const a=window.qzAnswers[i];if(a){if(a.opt===a.correct){a.el.classList.add('correct');correct++;}else{a.el.classList.add('wrong');document.querySelectorAll(`#qi-${i} .quiz-opt`).forEach(e=>{if(e.textContent===a.correct)e.classList.add('correct');});}}}const sc=document.getElementById('qz-score');sc.style.display='block';sc.textContent=`Score: ${correct}/${total}`;updateScore('quiz',correct,total);}
+function revealQuiz(){document.querySelectorAll('.quiz-item').forEach((item,i)=>{const a=window.qzAnswers[i];if(!a||a.opt!==a.correct)item.querySelectorAll('.quiz-opt').forEach(e=>{if(e.textContent===(a?a.correct:null))e.classList.add('correct');});});document.getElementById('qz-reveal').classList.add('show');}
+
+/* ─────────────────────────────────────────────────────────────
+   MISSING LETTERS
+───────────────────────────────────────────────────────────── */
+function buildMissing(){
+  const mlwords=pickRandom(WORDS_DATA,20,globalSeed+800);const r=seededRand(globalSeed+801);
+  const sb=sortedBank(mlwords.map(w=>w.word));
+  let html=`<div class="wordbank"><strong>📚 Word Bank (A–Z):</strong> ${sb.map(w=>`<span>${w}</span>`).join(' &nbsp;·&nbsp; ')}</div><div class="ml-grid">`;
+  let revRows='';
+  mlwords.forEach((w,i)=>{
+    const word=w.word.toUpperCase(),nr=word.length>6?2:1,pos=[];
+    while(pos.length<nr){const p=Math.floor(r()*word.length);if(!pos.includes(p))pos.push(p);}pos.sort();
+    let disp='';for(let j=0;j<word.length;j++)disp+=pos.includes(j)?'_':word[j];
+    const missing=pos.map(p=>word[p]).join('');
+    html+=`<div class="ml-item" id="mli-${i}"><div class="ml-display">${disp.split('').join(' ')}</div><div class="ml-hint">${w.hint}</div><div class="ml-input-row"><input type="text" maxlength="${nr}" placeholder="${'?'.repeat(nr)}" data-ans="${missing}" oninput="this.value=this.value.toUpperCase()"><span style="font-size:.8em;color:#888">(${nr} letter${nr>1?'s':''})</span></div></div>`;
+    revRows+=`<tr><td style="font-weight:bold;font-family:monospace">${disp.split('').join(' ')}</td><td class="reveal-answer">${missing}</td><td style="font-weight:bold">${word}</td><td>${w.hint}</td></tr>`;
+  });
+  html+=`</div>${btnRow(`checkMissing(${mlwords.length})`,'revealMissing()')}<div class="section-score" id="ml-score" style="display:none"></div><div class="reveal-panel" id="ml-reveal"><h4>💡 Missing Letters</h4><table class="reveal-table"><tr><th>Pattern</th><th>Missing</th><th>Full Word</th><th>Hint</th></tr>${revRows}</table></div>`;
+  document.getElementById('ml-inner').innerHTML=html;
+}
+function checkMissing(total){let correct=0;for(let i=0;i<total;i++){const item=document.getElementById('mli-'+i),inp=item.querySelector('input'),ans=inp.getAttribute('data-ans');item.classList.remove('correct','wrong');if(inp.value.trim().toUpperCase()===ans){item.classList.add('correct');correct++;}else if(inp.value.trim())item.classList.add('wrong');}const sc=document.getElementById('ml-score');sc.style.display='block';sc.textContent=`Score: ${correct}/${total}`;updateScore('missing',correct,total);}
+function revealMissing(){document.querySelectorAll('#ml-inner .ml-item').forEach(item=>{const inp=item.querySelector('input'),ans=inp.getAttribute('data-ans');if(!item.classList.contains('correct')){inp.value=ans;item.classList.add('wrong');}});document.getElementById('ml-reveal').classList.add('show');}
+
+/* ─────────────────────────────────────────────────────────────
+   LETTER CODING
+───────────────────────────────────────────────────────────── */
+function buildLetterCoding(){
+  const alpha='ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  const coded=shuffle(alpha,globalSeed+900);
+  window.lcMap={};alpha.forEach((ch,i)=>window.lcMap[ch]=coded[i]);
+  const lcwords=pickRandom(WORDS_DATA,20,globalSeed+901);
+  const sb=sortedBank(lcwords.map(w=>w.word));
+  let html=`<div class="lc-code-display"><div class="row"><span class="label">A to Z:</span>${alpha.map(c=>`<span class="alpha-cell">${c}</span>`).join('')}</div><div class="row"><span class="label">Coded:</span>${coded.map(c=>`<span class="alpha-cell coded-cell">${c}</span>`).join('')}</div></div>`;
+  html+=`<div class="wordbank"><strong>📚 Word Bank (A–Z):</strong> ${sb.map(w=>`<span>${w}</span>`).join(' &nbsp;·&nbsp; ')}</div><div class="lc-grid">`;
+  let revRows='';
+  lcwords.forEach((w,i)=>{const word=w.word.toUpperCase(),codedWord=word.split('').map(c=>window.lcMap[c]||c).join('');html+=`<div class="lc-item" id="lci-${i}"><div class="lc-coded">${codedWord}</div><div class="lc-hint">${w.hint}</div><input type="text" placeholder="Decode..." data-ans="${word}" oninput="this.value=this.value.toUpperCase()"></div>`;revRows+=`<tr><td style="font-weight:bold;font-family:monospace;color:var(--accent-blue)">${codedWord}</td><td class="reveal-answer">${word}</td><td>${w.hint}</td></tr>`;});
+  html+=`</div>${btnRow(`checkLetterCoding(${lcwords.length})`,'revealLetterCoding()')}<div class="section-score" id="lc-score" style="display:none"></div><div class="reveal-panel" id="lc-reveal"><h4>💡 Decoded Answers</h4><table class="reveal-table"><tr><th>Coded</th><th>Answer</th><th>Hint</th></tr>${revRows}</table></div>`;
+  document.getElementById('lc-inner').innerHTML=html;
+}
+function checkLetterCoding(total){let correct=0;for(let i=0;i<total;i++){const item=document.getElementById('lci-'+i),inp=item.querySelector('input'),ans=inp.getAttribute('data-ans');item.classList.remove('correct','wrong');if(inp.value.trim().toUpperCase()===ans){item.classList.add('correct');correct++;}else if(inp.value.trim())item.classList.add('wrong');}const sc=document.getElementById('lc-score');sc.style.display='block';sc.textContent=`Score: ${correct}/${total}`;updateScore('coding',correct,total);}
+function revealLetterCoding(){document.querySelectorAll('#lc-inner .lc-item').forEach(item=>{const inp=item.querySelector('input'),ans=inp.getAttribute('data-ans');if(!item.classList.contains('correct')){inp.value=ans;item.classList.add('wrong');}});document.getElementById('lc-reveal').classList.add('show');}
+
+/* ─────────────────────────────────────────────────────────────
+   CHOOSE BEST ANSWER
+───────────────────────────────────────────────────────────── */
+function buildChooseBest(){
+  const cbwords=pickRandom(WORDS_DATA,20,globalSeed+1000);
+  const allW=WORDS_DATA.map(w=>w.word),r=seededRand(globalSeed+1001);
+  window.cbAnswers={};cbwords.forEach((w,i)=>{window.cbAnswers[i]={correct:w.word,selected:null,el:null};});
+  let html='<div class="cb-grid">',revRows='';
+  cbwords.forEach((w,i)=>{
+    const wrong=[],used=new Set([w.word]);while(wrong.length<3){const c=allW[Math.floor(r()*allW.length)];if(!used.has(c)){wrong.push(c);used.add(c);}}
+    const opts=shuffle([w.word,...wrong],globalSeed+1000+i);
+    html+=`<div class="cb-item" id="cbi-${i}" data-correct="${w.word}"><div class="cb-hint">${w.hint}</div><div class="cb-opts">`;
+    opts.forEach((opt,oi)=>{const safe=opt.replace(/'/g,"\\'");html+=`<div class="cb-opt" id="cbo-${i}-${oi}" onclick="selectCBOpt(${i},this,'${safe}','${w.word.replace(/'/g,"\\'")}' )">${opt}</div>`;});
+    html+=`</div></div>`;revRows+=`<tr><td>Q${i+1}</td><td class="reveal-answer">${w.word}</td><td>${w.hint}</td></tr>`;
+  });
+  html+=`</div>${btnRow(`checkChooseBest(${cbwords.length})`,'revealChooseBest()')}<div class="section-score" id="cb-score" style="display:none"></div><div class="reveal-panel" id="cb-reveal"><h4>💡 Correct Answers</h4><table class="reveal-table"><tr><th>Q</th><th>Answer</th><th>Hint</th></tr>${revRows}</table></div>`;
+  document.getElementById('cb-inner').innerHTML=html;
+}
+function selectCBOpt(qi,el,opt,correct){document.querySelectorAll(`#cbi-${qi} .cb-opt`).forEach(e=>e.classList.remove('selected'));el.classList.add('selected');window.cbAnswers[qi]={correct,selected:opt,el};}
+function checkChooseBest(total){let correct=0;for(let i=0;i<total;i++){const a=window.cbAnswers[i];if(a&&a.selected){if(a.selected===a.correct){a.el.classList.add('correct');correct++;}else{a.el.classList.add('wrong');document.querySelectorAll(`#cbi-${i} .cb-opt`).forEach(e=>{if(e.textContent===a.correct)e.classList.add('correct');});}}}const sc=document.getElementById('cb-score');sc.style.display='block';sc.textContent=`Score: ${correct}/${total}`;updateScore('choose',correct,total);}
+function revealChooseBest(){document.querySelectorAll('.cb-item').forEach((item,i)=>{const a=window.cbAnswers[i];if(!a||a.selected!==a.correct)item.querySelectorAll('.cb-opt').forEach(e=>{if(e.textContent===a.correct)e.classList.add('correct');});});document.getElementById('cb-reveal').classList.add('show');}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   PDF GENERATION ENGINE
+   Uses jsPDF (loaded from CDN). Draws all 9 puzzles directly.
+   A4 Portrait: 210mm wide × 297mm tall, margins 12mm each side.
+   Content width = 186mm.
+═══════════════════════════════════════════════════════════════ */
+
+// ── Strip emoji — jsPDF standard fonts cannot render emoji glyphs
+function noEmoji(s){
+  if(!s)return '';
+  // Remove surrogate pairs (emoji encoded as pairs in JS strings)
+  let out='';
+  for(let i=0;i<s.length;i++){
+    const code=s.charCodeAt(i);
+    // Skip high surrogates (0xD800-0xDBFF) and their low pair
+    if(code>=0xD800&&code<=0xDBFF){i++;continue;}
+    // Skip misc symbol blocks above 0x25FF that aren't standard text
+    if(code>=0x2600&&code<=0x27BF)continue;
+    if(code>=0x2300&&code<=0x23FF)continue;
+    out+=s[i];
+  }
+  return out.replace(/\s{2,}/g,' ').trim();
+}
+
+// ── PDF helpers ──────────────────────────────────────────────────────────────
+const PDF = {
+  // Page constants (all in mm)
+  W: 210, H: 297,
+  ML: 12, MR: 12, MT: 14, MB: 12,
+  get CW(){ return this.W - this.ML - this.MR; }, // 186mm content width
+
+  // Colours as [r,g,b]
+  GOLD:      [139, 105, 20],
+  GOLD_LITE: [232, 208, 138],
+  NAVY:      [26,  58,  107],
+  DARK:      [44,  36,  22],
+  MID:       [90,  74,  42],
+  GREY:      [180, 180, 180],
+  LGREY:     [245, 242, 236],
+  BLACK:     [0,   0,   0],
+  WHITE:     [255, 255, 255],
+  GREEN:     [46,  125, 50],
+  BLUE:      [26,  58,  107],
+
+  setFill(doc, c){ doc.setFillColor(c[0],c[1],c[2]); },
+  setDraw(doc, c){ doc.setDrawColor(c[0],c[1],c[2]); },
+  setTxt(doc,  c){ doc.setTextColor(c[0],c[1],c[2]); },
+
+  // Draw page header banner (festival name + section title)
+  pageHeader(doc, sectionTitle, pageNum, totalPages){
+    // Banner background
+    this.setFill(doc, this.DARK);
+    doc.rect(this.ML, this.MT - 8, this.CW, 10, 'F');
+    // Festival name (left)
+    doc.setFont('helvetica','bold'); doc.setFontSize(10);
+    this.setTxt(doc, this.GOLD_LITE);
+    doc.text('Sri '+FESTIVAL_NAME, this.ML+2, this.MT-1);
+    // Section title (center)
+    doc.setFontSize(11);
+    this.setTxt(doc, this.WHITE);
+    doc.text(sectionTitle, this.W/2, this.MT-1, {align:'center'});
+    // Page num (right)
+    doc.setFont('helvetica','normal'); doc.setFontSize(8);
+    this.setTxt(doc, this.GOLD_LITE);
+    doc.text(`Page ${pageNum}${totalPages?' of '+totalPages:''}`, this.W-this.MR-1, this.MT-1, {align:'right'});
+    // Activities subtitle line
+    doc.setFontSize(7); this.setTxt(doc, this.GREY);
+    doc.text('Activities for Young Learners', this.W/2, this.MT+1, {align:'center'});
+  },
+
+  // Wrapped text — returns new y after writing
+  wrappedText(doc, text, x, y, maxW, lineH){
+    const lines = doc.splitTextToSize(text, maxW);
+    lines.forEach(l => { doc.text(l, x, y); y += lineH; });
+    return y;
+  },
+
+  // Section title bar
+  sectionBar(doc, title, y){
+    this.setFill(doc, this.GOLD);
+    doc.roundedRect(this.ML, y, this.CW, 7, 1.5, 1.5, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(12);
+    this.setTxt(doc, this.WHITE);
+    doc.text(title, this.W/2, y+4.8, {align:'center'});
+    return y + 9;
+  },
+
+  // Word bank line
+  wordBank(doc, words, y){
+    const sorted = [...words].sort((a,b)=>a.localeCompare(b));
+    doc.setFont('helvetica','bold'); doc.setFontSize(7);
+    this.setTxt(doc, this.GOLD);
+    doc.text('Word Bank (A-Z):', this.ML, y);
+    doc.setFont('helvetica','normal');
+    this.setTxt(doc, this.DARK);
+    const line = sorted.join('   ');
+    const lines = doc.splitTextToSize(line, this.CW - 30);
+    lines.forEach((l,i) => doc.text(l, this.ML+30, y + i*3.5));
+    return y + lines.length * 3.5 + 2;
+  },
+
+  // Answer line  ___________
+  answerLine(doc, x, y, w){
+    this.setDraw(doc, this.GREY);
+    doc.setLineWidth(0.3);
+    doc.line(x, y, x+w, y);
+  },
+
+  // Small answer box □
+  answerBox(doc, x, y, size){
+    this.setDraw(doc, this.GREY);
+    this.setFill(doc, this.WHITE);
+    doc.setLineWidth(0.3);
+    doc.rect(x, y-size+1, size, size, 'FD');
+  },
+
+  newPage(doc, sectionTitle, pageCounter){
+    doc.addPage();
+    pageCounter.n++;
+    this.pageHeader(doc, sectionTitle, pageCounter.n);
+    return this.MT + 5;
+  },
+
+  checkY(doc, y, needed, sectionTitle, pageCounter){
+    if(y + needed > this.H - this.MB){
+      return this.newPage(doc, sectionTitle, pageCounter);
+    }
+    return y;
+  }
+};
+
+// ── Collect puzzle data from live DOM ────────────────────────────────────────
+function collectPuzzleData(){
+  const data = {};
+
+  // CROSSWORD — read grid cells and clues
+  data.crossword = { cells:[], acrossClues:[], downClues:[], words:[] };
+  document.querySelectorAll('.cw-grid tr').forEach((tr,ri)=>{
+    tr.querySelectorAll('td').forEach((td,ci)=>{
+      const ans = td.getAttribute('data-ans');
+      const num = td.querySelector('.cell-num');
+      data.crossword.cells.push({
+        ri, ci, ans: ans||null, black: td.classList.contains('black'),
+        num: num ? parseInt(num.textContent) : null
+      });
+    });
+  });
+  // Count cols
+  const firstRow = document.querySelector('.cw-grid tr');
+  data.crossword.cols = firstRow ? firstRow.querySelectorAll('td').length : 0;
+  data.crossword.rows = document.querySelectorAll('.cw-grid tr').length;
+  // Clues from clue lists
+  document.querySelectorAll('.cw-clues-col').forEach(col=>{
+    const isAcross = col.querySelector('h4').textContent.trim().toUpperCase()==='ACROSS';
+    col.querySelectorAll('li').forEach(li=>{
+      const text = li.textContent.trim();
+      (isAcross ? data.crossword.acrossClues : data.crossword.downClues).push(text);
+    });
+  });
+
+  // WORD SEARCH — read grid, placed word positions and word list
+  data.wordsearch = { grid:[], words:[], placed:[] };
+  document.querySelectorAll('#ws-grid .ws-row').forEach(row=>{
+    const r = [];
+    row.querySelectorAll('.ws-cell').forEach(c=>r.push(c.textContent.trim()));
+    data.wordsearch.grid.push(r);
+  });
+  document.querySelectorAll('.ws-word-item').forEach(el=>data.wordsearch.words.push(el.textContent.trim()));
+  // Collect cell positions for each placed word (stored as data-placed JSON)
+  try{
+    const pd = document.getElementById('ws-inner').getAttribute('data-placed');
+    if(pd) data.wordsearch.placed = JSON.parse(pd);
+  }catch(e){}
+
+  // JUMBLED — scrambled word + hint + answer
+  data.jumbled = [];
+  document.querySelectorAll('.jumble-item').forEach(item=>{
+    data.jumbled.push({
+      jumbled: item.querySelector('.jumbled').textContent.trim(),
+      hint:    item.querySelector('.hint').textContent.trim(),
+      answer:  item.getAttribute('data-ans')
+    });
+  });
+
+  // MATCH PAIRS — left items + right items (from the two columns)
+  data.matchpairs = { left:[], right:[], words:[] };
+  const cols = document.querySelectorAll('.match-container .match-col');
+  if(cols[0]) cols[0].querySelectorAll('.match-item').forEach(el=>data.matchpairs.left.push({id:el.getAttribute('data-id'),text:el.textContent.trim()}));
+  if(cols[1]) cols[1].querySelectorAll('.match-item').forEach(el=>data.matchpairs.right.push({id:el.getAttribute('data-id'),text:el.textContent.trim()}));
+  // Answer key: find pairs
+  data.matchpairs.left.forEach(l=>{
+    const r = data.matchpairs.right.find(r=>r.id===l.id);
+    if(r) data.matchpairs.words.push({left:l.text, right:r.text, full:l.text+r.text});
+  });
+
+  // FILL BLANKS — story text with blanks, per-story word banks
+  data.fillblanks = [];
+  document.querySelectorAll('.fitb-story-block').forEach((block,si)=>{
+    const words = [];
+    block.querySelectorAll('.fitb-bank-word').forEach(el=>words.push(el.getAttribute('data-word')));
+    // Reconstruct text with blanks
+    const parts = [];
+    block.querySelector('.fitb-story-text').childNodes.forEach(node=>{
+      if(node.nodeType===3) parts.push({type:'text',text:node.textContent});
+      else if(node.classList&&node.classList.contains('blank-word')) parts.push({type:'blank',answer:node.getAttribute('data-ans')});
+    });
+    data.fillblanks.push({storyNum:si+1, parts, words});
+  });
+
+  // QUIZ — correct answer stored in data-correct attribute set during buildQuiz
+  data.quiz = [];
+  document.querySelectorAll('.quiz-item').forEach((item,i)=>{
+    const opts = [];
+    item.querySelectorAll('.quiz-opt').forEach(o=>opts.push(o.textContent.trim()));
+    data.quiz.push({ num:i+1, hint:item.querySelector('.q-hint').textContent.trim(), opts,
+      answer: item.getAttribute('data-correct') });
+  });
+
+  // MISSING LETTERS
+  data.missing = [];
+  document.querySelectorAll('.ml-item').forEach(item=>{
+    data.missing.push({
+      display: item.querySelector('.ml-display').textContent.trim(),
+      hint:    item.querySelector('.ml-hint').textContent.trim(),
+      answer:  item.querySelector('input').getAttribute('data-ans')
+    });
+  });
+
+  // LETTER CODING — cipher map + coded words
+  data.coding = { alpha:[], coded:[], items:[] };
+  const alphaSpans = document.querySelectorAll('.lc-code-display .alpha-cell:not(.coded-cell)');
+  const codedSpans = document.querySelectorAll('.lc-code-display .coded-cell');
+  alphaSpans.forEach(s=>data.coding.alpha.push(s.textContent.trim()));
+  codedSpans.forEach(s=>data.coding.coded.push(s.textContent.trim()));
+  document.querySelectorAll('.lc-item').forEach(item=>{
+    data.coding.items.push({
+      coded:  item.querySelector('.lc-coded').textContent.trim(),
+      hint:   item.querySelector('.lc-hint').textContent.trim(),
+      answer: item.querySelector('input').getAttribute('data-ans')
+    });
+  });
+
+  // CHOOSE BEST — correct answer stored in data-correct attribute set during buildChooseBest
+  data.choose = [];
+  document.querySelectorAll('.cb-item').forEach((item,i)=>{
+    const opts = [];
+    item.querySelectorAll('.cb-opt').forEach(o=>opts.push(o.textContent.trim()));
+    data.choose.push({ num:i+1, hint:item.querySelector('.cb-hint').textContent.trim(), opts,
+      answer: item.getAttribute('data-correct') });
+  });
+
+  return data;
+}
+
+// ── DRAW FUNCTIONS per section ───────────────────────────────────────────────
+
+function drawCrossword(doc, data, isKey, pc){
+  const title = 'Crossword Puzzle';
+  let y = PDF.MT + 5;
+  PDF.pageHeader(doc, noEmoji(title), pc.n);
+  y = PDF.sectionBar(doc, noEmoji(title), y);
+  y += 2;
+
+  // Instructions
+  doc.setFont('helvetica','italic'); doc.setFontSize(7.5);
+  PDF.setTxt(doc, PDF.MID);
+  if(!isKey) doc.text('Fill in the crossword using the clues below.', PDF.ML, y);
+  y += 5;
+
+  // Draw grid
+  const cols = data.crossword.cols, rows = data.crossword.rows;
+  if(cols===0||rows===0){ doc.text('(Crossword grid not available)', PDF.ML, y); return; }
+  const maxGridW = PDF.CW * 0.6;
+  const cs = Math.min(6.5, Math.floor((maxGridW/cols)*10)/10); // cell size mm
+  const gridW = cs*cols, gridH = cs*rows;
+  const gx = PDF.ML;
+  let gy = y;
+
+  doc.setLineWidth(0.2);
+  data.crossword.cells.forEach(cell=>{
+    const x = gx + cell.ci*cs, cy = gy + cell.ri*cs;
+    if(cell.black){
+      PDF.setFill(doc, PDF.DARK);
+      doc.rect(x, cy, cs, cs, 'F');
+    } else {
+      PDF.setFill(doc, PDF.WHITE);
+      PDF.setDraw(doc, PDF.GREY);
+      doc.rect(x, cy, cs, cs, 'FD');
+      if(cell.num){
+        doc.setFontSize(3.5); PDF.setTxt(doc, PDF.GOLD);
+        doc.text(String(cell.num), x+0.5, cy+2.5);
+      }
+      if(isKey && cell.ans){
+        doc.setFont('helvetica','bold'); doc.setFontSize(cs*0.55);
+        PDF.setTxt(doc, PDF.NAVY);
+        doc.text(cell.ans, x+cs/2, cy+cs-1.2, {align:'center'});
+      }
+    }
+  });
+
+  // Clues to the right
+  const clueX = gx + gridW + 5;
+  const clueW = PDF.CW - gridW - 5;
+  let cy2 = y;
+  doc.setFont('helvetica','bold'); doc.setFontSize(7.5); PDF.setTxt(doc, PDF.NAVY);
+  doc.text('ACROSS', clueX, cy2); cy2+=4;
+  doc.setFont('helvetica','normal'); doc.setFontSize(6.5); PDF.setTxt(doc, PDF.DARK);
+  data.crossword.acrossClues.forEach(cl=>{
+    const lines = doc.splitTextToSize(cl, clueW);
+    lines.forEach(l=>{ doc.text(l, clueX, cy2); cy2+=3.2; });
+    cy2 += 0.5;
+  });
+  cy2 += 3;
+  doc.setFont('helvetica','bold'); doc.setFontSize(7.5); PDF.setTxt(doc, PDF.NAVY);
+  doc.text('DOWN', clueX, cy2); cy2+=4;
+  doc.setFont('helvetica','normal'); doc.setFontSize(6.5); PDF.setTxt(doc, PDF.DARK);
+  data.crossword.downClues.forEach(cl=>{
+    const lines = doc.splitTextToSize(cl, clueW);
+    lines.forEach(l=>{ doc.text(l, clueX, cy2); cy2+=3.2; });
+    cy2 += 0.5;
+  });
+}
+
+function drawWordSearch(doc, data, isKey, pc){
+  const title = 'Word Search';
+  let y = PDF.MT + 5;
+  PDF.pageHeader(doc, noEmoji(title), pc.n);
+  y = PDF.sectionBar(doc, noEmoji(title), y);
+  y += 2;
+  doc.setFont('helvetica','italic'); doc.setFontSize(7.5); PDF.setTxt(doc, PDF.MID);
+  if(isKey)
+    doc.text('Answer Key — hidden words are highlighted in the grid below.', PDF.ML, y);
+  else
+    doc.text('Find the hidden words — they run horizontally, vertically, or diagonally.', PDF.ML, y);
+  y += 5;
+
+  const grid = data.wordsearch.grid;
+  if(!grid.length){ doc.text('(Grid not available)',PDF.ML,y); return; }
+  const rows = grid.length, cols = grid[0].length;
+  const cs = Math.min(7, Math.floor((PDF.CW*0.65/cols)*10)/10);
+  const gx = PDF.ML;
+
+  // Build a Set of highlighted cell keys for answer key
+  const hlCells = new Map(); // key='r,c' -> colour array
+  // Map word -> colour index for varied highlighting
+  const hlColors = [
+    [255,235,180], // amber
+    [200,235,200], // green
+    [200,220,255], // blue
+    [255,210,210], // pink
+    [220,200,255], // purple
+    [200,245,235], // teal
+    [255,245,180], // yellow
+    [255,220,190], // orange
+    [210,230,255], // sky
+    [235,255,200], // lime
+    [255,200,230], // rose
+    [200,255,250], // cyan
+  ];
+  const wordColorMap = {};
+  if(isKey && data.wordsearch.placed && data.wordsearch.placed.length){
+    data.wordsearch.placed.forEach((p,idx)=>{
+      const col = hlColors[idx % hlColors.length];
+      wordColorMap[p.word] = col;
+      p.key.split('|').forEach(k=>hlCells.set(k, col));
+    });
+  }
+
+  // Draw grid — two passes: fill first, then letters on top
+  doc.setLineWidth(0.15);
+  grid.forEach((row,ri)=>{
+    row.forEach((ch,ci)=>{
+      const x=gx+ci*cs, cy=y+ri*cs;
+      const cellKey=ri+','+ci;
+      const hlColor = isKey ? hlCells.get(cellKey) : null;
+      if(hlColor){
+        // Highlighted word cell
+        doc.setFillColor(hlColor[0],hlColor[1],hlColor[2]);
+        PDF.setDraw(doc, [hlColor[0]-30,hlColor[1]-30,hlColor[2]-30]);
+      } else {
+        PDF.setFill(doc, PDF.WHITE);
+        PDF.setDraw(doc, PDF.GOLD_LITE);
+      }
+      doc.rect(x,cy,cs,cs,'FD');
+      doc.setFont('courier','bold');
+      doc.setFontSize(cs*0.65);
+      // Bold dark text on highlights, lighter grey on non-word cells in key
+      if(isKey && !hlColor) PDF.setTxt(doc, PDF.GREY);
+      else PDF.setTxt(doc, PDF.DARK);
+      doc.text(ch, x+cs/2, cy+cs-1.5, {align:'center'});
+    });
+  });
+
+  // Word list to the right with colour swatches in answer key
+  const wx = gx + cols*cs + 6;
+  const ww = PDF.CW - cols*cs - 6;
+  let wy = y;
+  doc.setFont('helvetica','bold'); doc.setFontSize(7.5); PDF.setTxt(doc, PDF.NAVY);
+  doc.text(isKey ? 'Answer Key' : 'Words to Find', wx, wy); wy+=5;
+  doc.setFont('helvetica','normal'); doc.setFontSize(7);
+  data.wordsearch.words.forEach((w,idx)=>{
+    if(wy > PDF.H-PDF.MB-10) wy = y;
+    if(isKey){
+      // Draw colour swatch
+      const col = hlColors[idx % hlColors.length];
+      doc.setFillColor(col[0],col[1],col[2]);
+      PDF.setDraw(doc, PDF.GREY);
+      doc.setLineWidth(0.2);
+      doc.rect(wx, wy-3, 4, 3.5, 'FD');
+      PDF.setTxt(doc, PDF.DARK);
+      doc.text(w, wx+5.5, wy);
+    } else {
+      PDF.setTxt(doc, PDF.DARK);
+      doc.text('* '+w, wx, wy);
+    }
+    wy+=4.5;
+  });
+}
+
+function drawJumbled(doc, data, isKey, pc){
+  const title = 'Jumbled Words';
+  let y = PDF.MT + 5;
+  PDF.pageHeader(doc, noEmoji(title), pc.n);
+  y = PDF.sectionBar(doc, noEmoji(title), y);
+  y += 2;
+  // Word bank
+  const words = data.jumbled.map(j=>j.answer);
+  y = PDF.wordBank(doc, words, y);
+  y += 2;
+  doc.setFont('helvetica','italic'); doc.setFontSize(7.5); PDF.setTxt(doc, PDF.MID);
+  doc.text('Rearrange the scrambled letters to form the correct word. Use the word bank as a hint.', PDF.ML, y);
+  y += 5;
+
+  const COL=2, colW=(PDF.CW-8)/COL, boxH=14;
+  data.jumbled.forEach((item,i)=>{
+    y = PDF.checkY(doc, y, boxH+2, title, pc);
+    const col = i%COL, row = Math.floor(i/COL);
+    if(i>0 && col===0) {} // y already advanced
+    const x = PDF.ML + col*(colW+8);
+    const bx = x, by = y;
+    // Box
+    PDF.setFill(doc, PDF.LGREY); PDF.setDraw(doc, PDF.GOLD_LITE);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(bx, by, colW, boxH, 1.5, 1.5, 'FD');
+    // Number
+    doc.setFont('helvetica','bold'); doc.setFontSize(7); PDF.setTxt(doc, PDF.GOLD);
+    doc.text(String(i+1)+'.', bx+2, by+4.5);
+    // Jumbled word
+    doc.setFont('courier','bold'); doc.setFontSize(10); PDF.setTxt(doc, PDF.DARK);
+    doc.text(item.jumbled, bx+10, by+4.5);
+    // Hint
+    doc.setFont('helvetica','italic'); doc.setFontSize(6.5); PDF.setTxt(doc, PDF.MID);
+    const hint = doc.splitTextToSize(item.hint, colW-4);
+    hint.slice(0,1).forEach(l=>doc.text(l, bx+2, by+8.5));
+    // Answer line or answer
+    if(isKey){
+      doc.setFont('helvetica','bold'); doc.setFontSize(8.5); PDF.setTxt(doc, PDF.NAVY);
+      doc.text(item.answer, bx+2, by+12.5);
+    } else {
+      PDF.answerLine(doc, bx+2, by+12.5, colW-4);
+    }
+    if(col===COL-1 || i===data.jumbled.length-1) y += boxH+3;
+  });
+}
+
+function drawMatchPairs(doc, data, isKey, pc){
+  const title = 'Match Pairs';
+  let y = PDF.MT + 5;
+  PDF.pageHeader(doc, noEmoji(title), pc.n);
+  y = PDF.sectionBar(doc, noEmoji(title), y);
+  y += 2;
+  // Word bank
+  y = PDF.wordBank(doc, data.matchpairs.left.map(l=>l.text+data.matchpairs.right.find(r=>r.id===l.id)?.text||''), y);
+  y += 2;
+  doc.setFont('helvetica','italic'); doc.setFontSize(7.5); PDF.setTxt(doc, PDF.MID);
+  doc.text('Draw a line from each word on the left to its matching half on the right.', PDF.ML, y);
+  y += 5;
+
+  const leftX=PDF.ML, rightX=PDF.ML+PDF.CW/2+4;
+  const colW=PDF.CW/2-8, rowH=6.5;
+
+  // Headers
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); PDF.setTxt(doc, PDF.NAVY);
+  doc.text('First Half', leftX, y);
+  doc.text('Second Half', rightX, y);
+  y+=5;
+
+  data.matchpairs.left.forEach((lItem,i)=>{
+    y = PDF.checkY(doc, y, rowH+1, title, pc);
+    const rItem = data.matchpairs.right[i];
+    // Left box
+    PDF.setFill(doc, PDF.LGREY); PDF.setDraw(doc, PDF.GOLD_LITE); doc.setLineWidth(0.2);
+    doc.roundedRect(leftX, y-4, colW, rowH, 1,1,'FD');
+    doc.setFont('helvetica','bold'); doc.setFontSize(8); PDF.setTxt(doc, PDF.DARK);
+    doc.text(lItem.text, leftX+colW/2, y, {align:'center'});
+    // Answer line (puzzle) or matched answer (key)
+    if(isKey){
+      const matched = data.matchpairs.right.find(r=>r.id===lItem.id);
+      PDF.setFill(doc, [232,245,233]); PDF.setDraw(doc, PDF.GREEN); doc.setLineWidth(0.2);
+      doc.roundedRect(rightX, y-4, colW, rowH, 1,1,'FD');
+      doc.setFont('helvetica','bold'); doc.setFontSize(8); PDF.setTxt(doc, PDF.GREEN);
+      doc.text(matched?matched.text:'', rightX+colW/2, y, {align:'center'});
+      // Arrow
+      PDF.setDraw(doc, PDF.GREEN); doc.setLineWidth(0.4);
+      doc.line(leftX+colW+1, y-1, rightX-1, y-1);
+    } else {
+      // Right box shuffled
+      PDF.setFill(doc, PDF.LGREY); PDF.setDraw(doc, PDF.GOLD_LITE); doc.setLineWidth(0.2);
+      doc.roundedRect(rightX, y-4, colW, rowH, 1,1,'FD');
+      if(rItem){
+        doc.setFont('helvetica','bold'); doc.setFontSize(8); PDF.setTxt(doc, PDF.DARK);
+        doc.text(rItem.text, rightX+colW/2, y, {align:'center'});
+      }
+    }
+    y += rowH+1;
+  });
+}
+
+function drawFillBlanks(doc, data, isKey, pc){
+  const title = 'Fill in the Blanks';
+  let y = PDF.MT + 5;
+  PDF.pageHeader(doc, noEmoji(title), pc.n);
+  y = PDF.sectionBar(doc, noEmoji(title), y);
+  y += 2;
+  doc.setFont('helvetica','italic'); doc.setFontSize(7.5); PDF.setTxt(doc, PDF.MID);
+  doc.text('Fill in the missing words using the word bank provided for each story.', PDF.ML, y);
+  y += 5;
+
+  data.fillblanks.forEach((story,si)=>{
+    y = PDF.checkY(doc, y, 25, title, pc);
+    // Story header
+    PDF.setFill(doc, PDF.GOLD_LITE); PDF.setDraw(doc, PDF.GOLD); doc.setLineWidth(0.3);
+    doc.roundedRect(PDF.ML, y-3.5, PDF.CW, 6, 1,1,'FD');
+    doc.setFont('helvetica','bold'); doc.setFontSize(8.5); PDF.setTxt(doc, PDF.DARK);
+    doc.text('Story '+story.storyNum, PDF.ML+3, y+1);
+    y += 5;
+    // Word bank for this story
+    y = PDF.wordBank(doc, story.words.map(w=>w), y);
+    y += 1;
+    // Story text — reconstruct with blanks
+    let fullText = '';
+    story.parts.forEach(part=>{
+      if(part.type==='text') fullText += part.text;
+      else if(part.type==='blank'){
+        if(isKey) fullText += '['+part.answer+']';
+        else fullText += '___________';
+      }
+    });
+    doc.setFont('helvetica','normal'); doc.setFontSize(8); PDF.setTxt(doc, PDF.DARK);
+    if(isKey){ doc.setFont('helvetica','normal'); PDF.setTxt(doc, PDF.DARK); }
+    const lines = doc.splitTextToSize(fullText, PDF.CW);
+    lines.forEach(l=>{
+      y = PDF.checkY(doc, y, 4, title, pc);
+      // Highlight answers in key mode
+      if(isKey){
+        doc.setFont('helvetica','normal'); doc.setFontSize(8); PDF.setTxt(doc, PDF.DARK);
+        // Simple: just print the line; answers shown in brackets
+        doc.text(l, PDF.ML, y);
+      } else {
+        doc.text(l, PDF.ML, y);
+      }
+      y += 4;
+    });
+    y += 4;
+  });
+}
+
+function drawQuiz(doc, data, isKey, pc, section){
+  // section = 'quiz' or 'choose'
+  const isChoose = section==='choose';
+  const items = isChoose ? data.choose : data.quiz;
+  const title = isChoose ? 'Choose the Best Answer' : 'Quiz';
+  let y = PDF.MT + 5;
+  PDF.pageHeader(doc, noEmoji(title), pc.n);
+  y = PDF.sectionBar(doc, noEmoji(title), y);
+  y += 2;
+  doc.setFont('helvetica','italic'); doc.setFontSize(7.5); PDF.setTxt(doc, PDF.MID);
+  doc.text(isChoose
+    ? 'Circle the letter of the best answer for each description.'
+    : 'Read the clue and circle the letter of the correct answer.',
+    PDF.ML, y);
+  y += 5;
+
+  items.forEach((item,i)=>{
+    const boxH = 22;
+    y = PDF.checkY(doc, y, boxH+2, title, pc);
+    // Box
+    PDF.setFill(doc, PDF.LGREY); PDF.setDraw(doc, PDF.GOLD_LITE); doc.setLineWidth(0.2);
+    doc.roundedRect(PDF.ML, y, PDF.CW, boxH, 1.5,1.5,'FD');
+    // Q number
+    doc.setFont('helvetica','bold'); doc.setFontSize(7.5); PDF.setTxt(doc, PDF.GOLD);
+    doc.text('Q'+item.num, PDF.ML+2, y+4.5);
+    // Hint
+    doc.setFont('helvetica','italic'); doc.setFontSize(7.5); PDF.setTxt(doc, PDF.DARK);
+    const hintLines = doc.splitTextToSize(item.hint, PDF.CW-12);
+    hintLines.slice(0,2).forEach((l,li)=>doc.text(l, PDF.ML+10, y+4.5+li*3.5));
+    // Options in 2×2 grid
+    const optLabels = ['A','B','C','D'];
+    const optW = PDF.CW/2-4;
+    item.opts.forEach((opt,oi)=>{
+      const ox = PDF.ML + (oi%2)*(optW+8) + 2;
+      const oy = y+12 + Math.floor(oi/2)*5;
+      const isCorrect = isKey && opt===item.answer;
+      // Circle
+      if(isCorrect){ PDF.setFill(doc, PDF.GREEN); PDF.setDraw(doc, PDF.GREEN); }
+      else { PDF.setFill(doc, PDF.WHITE); PDF.setDraw(doc, PDF.GREY); }
+      doc.setLineWidth(0.3); doc.circle(ox+2, oy-1, 1.8, 'FD');
+      doc.setFont('helvetica','bold'); doc.setFontSize(7);
+      PDF.setTxt(doc, isCorrect?PDF.WHITE:PDF.DARK);
+      doc.text(optLabels[oi], ox+1.3, oy+0.2);
+      doc.setFont('helvetica','normal'); doc.setFontSize(7);
+      PDF.setTxt(doc, isCorrect?PDF.GREEN:PDF.DARK);
+      doc.text(opt, ox+5.5, oy+0.2);
+    });
+    y += boxH+3;
+  });
+}
+
+function drawMissing(doc, data, isKey, pc){
+  const title = 'Missing Letters';
+  let y = PDF.MT + 5;
+  PDF.pageHeader(doc, noEmoji(title), pc.n);
+  y = PDF.sectionBar(doc, noEmoji(title), y);
+  y += 2;
+  y = PDF.wordBank(doc, data.missing.map(m=>{
+    // Reconstruct full word from display + answer
+    return m.display.replace(/ /g,'').replace(/_/g,'?'); // approximate
+  }), y);
+  y += 2;
+  doc.setFont('helvetica','italic'); doc.setFontSize(7.5); PDF.setTxt(doc, PDF.MID);
+  doc.text('Fill in the missing letter(s) shown as _ in each word. Use the hint to help you.', PDF.ML, y);
+  y += 5;
+
+  const COL=2, colW=(PDF.CW-8)/COL, boxH=13;
+  data.missing.forEach((item,i)=>{
+    y = PDF.checkY(doc, y, boxH+2, title, pc);
+    const col=i%COL;
+    const x = PDF.ML + col*(colW+8);
+    // Box
+    PDF.setFill(doc, PDF.LGREY); PDF.setDraw(doc, PDF.GOLD_LITE); doc.setLineWidth(0.3);
+    doc.roundedRect(x, y, colW, boxH, 1.5,1.5,'FD');
+    // Number
+    doc.setFont('helvetica','bold'); doc.setFontSize(7); PDF.setTxt(doc, PDF.GOLD);
+    doc.text(String(i+1)+'.', x+2, y+4.5);
+    // Pattern
+    doc.setFont('courier','bold'); doc.setFontSize(10); PDF.setTxt(doc, PDF.DARK);
+    doc.text(item.display, x+10, y+4.5);
+    // Hint
+    doc.setFont('helvetica','italic'); doc.setFontSize(6); PDF.setTxt(doc, PDF.MID);
+    doc.text(doc.splitTextToSize(item.hint,colW-4)[0], x+2, y+8.5);
+    // Answer box or answer
+    if(isKey){
+      doc.setFont('helvetica','bold'); doc.setFontSize(9); PDF.setTxt(doc, PDF.NAVY);
+      doc.text('→ '+item.answer, x+2, y+12);
+    } else {
+      PDF.answerBox(doc, x+colW-9, y+7, 7);
+    }
+    if(col===COL-1 || i===data.missing.length-1) y += boxH+3;
+  });
+}
+
+function drawCoding(doc, data, isKey, pc){
+  const title = 'Letter Coding';
+  let y = PDF.MT + 5;
+  PDF.pageHeader(doc, noEmoji(title), pc.n);
+  y = PDF.sectionBar(doc, noEmoji(title), y);
+  y += 2;
+  doc.setFont('helvetica','italic'); doc.setFontSize(7.5); PDF.setTxt(doc, PDF.MID);
+  doc.text('Use the secret code table below to decode each word. Write your answer on the line.', PDF.ML, y);
+  y += 5;
+
+  // Cipher table — two rows (A-Z mapped)
+  const alpha = data.coding.alpha, coded = data.coding.coded;
+  if(alpha.length===26){
+    const cs=6.5, tableW=cs*26;
+    const startX = PDF.ML;
+    // Row labels
+    doc.setFont('helvetica','bold'); doc.setFontSize(6.5); PDF.setTxt(doc, PDF.GOLD);
+    doc.text('A-Z:', startX, y+3.5);
+    doc.text('Code:', startX, y+3.5+cs);
+    const tx = startX+10;
+    // Draw cells
+    alpha.forEach((ch,i)=>{
+      const x=tx+i*cs;
+      // Original letter row
+      PDF.setFill(doc, PDF.WHITE); PDF.setDraw(doc, PDF.GREY); doc.setLineWidth(0.15);
+      doc.rect(x,y,cs,cs,'FD');
+      doc.setFont('helvetica','bold'); doc.setFontSize(6.5); PDF.setTxt(doc, PDF.DARK);
+      doc.text(ch, x+cs/2, y+cs-1, {align:'center'});
+      // Coded letter row
+      PDF.setFill(doc, [238,243,255]); PDF.setDraw(doc, PDF.NAVY); doc.setLineWidth(0.15);
+      doc.rect(x,y+cs,cs,cs,'FD');
+      doc.setFont('helvetica','bold'); doc.setFontSize(6.5); PDF.setTxt(doc, PDF.NAVY);
+      doc.text(coded[i]||'?', x+cs/2, y+cs*2-1, {align:'center'});
+    });
+    y += cs*2+5;
+  }
+
+  const COL=2, colW=(PDF.CW-8)/COL, boxH=13;
+  data.coding.items.forEach((item,i)=>{
+    y = PDF.checkY(doc, y, boxH+2, title, pc);
+    const col=i%COL;
+    const x = PDF.ML + col*(colW+8);
+    PDF.setFill(doc, PDF.LGREY); PDF.setDraw(doc, PDF.GOLD_LITE); doc.setLineWidth(0.3);
+    doc.roundedRect(x, y, colW, boxH, 1.5,1.5,'FD');
+    doc.setFont('helvetica','bold'); doc.setFontSize(7); PDF.setTxt(doc, PDF.GOLD);
+    doc.text(String(i+1)+'.', x+2, y+4.5);
+    doc.setFont('courier','bold'); doc.setFontSize(9.5); PDF.setTxt(doc, PDF.NAVY);
+    doc.text(item.coded, x+10, y+4.5);
+    doc.setFont('helvetica','italic'); doc.setFontSize(6); PDF.setTxt(doc, PDF.MID);
+    doc.text(doc.splitTextToSize(item.hint,colW-4)[0], x+2, y+8.5);
+    if(isKey){
+      doc.setFont('helvetica','bold'); doc.setFontSize(9); PDF.setTxt(doc, PDF.NAVY);
+      doc.text(item.answer, x+2, y+12);
+    } else {
+      PDF.answerLine(doc, x+2, y+12, colW-4);
+    }
+    if(col===COL-1 || i===data.coding.items.length-1) y += boxH+3;
+  });
+}
+
+// ── MAIN PDF GENERATOR ───────────────────────────────────────────────────────
+function generatePDF(isKey){
+  if(typeof window.jspdf === 'undefined'){
+    alert('PDF library not loaded yet. Please wait a moment and try again.');
+    return;
+  }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+  const pc = { n: 1 }; // page counter object (mutable)
+  const data = collectPuzzleData();
+  const suffix = isKey ? ' — Answer Key' : ' — Activity Sheets';
+  const filename = `Sri_${FESTIVAL_NAME.replace(/\s+/g,'_')}${isKey?'_AnswerKey':'_Puzzles'}.pdf`;
+
+  // Cover page
+  PDF.setFill(doc, PDF.DARK);
+  doc.rect(0,0,PDF.W,PDF.H,'F');
+  // Gold border
+  PDF.setDraw(doc, PDF.GOLD); doc.setLineWidth(2);
+  doc.rect(8,8,PDF.W-16,PDF.H-16);
+  // Title
+  doc.setFont('helvetica','bold'); doc.setFontSize(28);
+  PDF.setTxt(doc, PDF.GOLD_LITE);
+  doc.text('Sri '+FESTIVAL_NAME, PDF.W/2, 80, {align:'center'});
+  doc.setFontSize(18); PDF.setTxt(doc, PDF.WHITE);
+  doc.text('Activities for Young Learners', PDF.W/2, 95, {align:'center'});
+  doc.setFontSize(14); PDF.setTxt(doc, PDF.GOLD_LITE);
+  doc.text(isKey ? '— Answer Key —' : '— Activity Sheets —', PDF.W/2, 112, {align:'center'});
+  // Section list
+  doc.setFont('helvetica','normal'); doc.setFontSize(10); PDF.setTxt(doc, PDF.GREY);
+  const sections = ['Crossword','Word Search','Jumbled Words','Match Pairs',
+                    'Fill in the Blanks','Quiz','Missing Letters','Letter Coding','Choose Best Answer'];
+  sections.forEach((s,i)=>doc.text(s, PDF.W/2, 135+i*9, {align:'center'}));
+  // Footer
+  doc.setFontSize(8); PDF.setTxt(doc, PDF.GOLD_LITE);
+  doc.text('Generated by Sri '+FESTIVAL_NAME+' Activity Program', PDF.W/2, PDF.H-20, {align:'center'});
+
+  // Section pages
+  const drawSec = (fn) => { doc.addPage(); pc.n++; fn(); };
+
+  drawSec(()=>drawCrossword(doc, data, isKey, pc));
+  drawSec(()=>drawWordSearch(doc, data, isKey, pc));
+  drawSec(()=>drawJumbled(doc, data, isKey, pc));
+  drawSec(()=>drawMatchPairs(doc, data, isKey, pc));
+  drawSec(()=>drawFillBlanks(doc, data, isKey, pc));
+  drawSec(()=>drawQuiz(doc, data, isKey, pc, 'quiz'));
+  drawSec(()=>drawMissing(doc, data, isKey, pc));
+  drawSec(()=>drawCoding(doc, data, isKey, pc));
+  drawSec(()=>drawQuiz(doc, data, isKey, pc, 'choose'));
+
+  doc.save(filename);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   BUILD ALL
+───────────────────────────────────────────────────────────── */
+function buildAll(){
+  Object.keys(scores).forEach(k=>scores[k]=0);
+  ['crossword','wordsearch','jumbled','matchpairs','fillblanks','quiz','missing','coding','choose'].forEach(k=>{
+    scores[k]=0;
+    const btn=document.getElementById('nb-'+k);
+    if(btn)btn.textContent=BTN_LABELS[k]+' (0)';
+  });
+  const tot=document.getElementById('sc-total');if(tot)tot.textContent='🏆 0';
+  buildCrossword();buildWordSearch();buildJumbled();buildMatchPairs();
+  buildFillBlanks();buildQuiz();buildMissing();buildLetterCoding();buildChooseBest();
+  showSection('crossword',document.querySelector('.nav-btn'));
+}
+
+// ── Start boot sequence on page load ─────────────────────────
+boot();
+</script>
+</body>
+</html>
