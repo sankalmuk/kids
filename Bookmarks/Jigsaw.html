@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jigsaw Puzzle</title>
+<link href="https://fonts.googleapis.com/css2?family=Philosopher:ital,wght@0,400;0,700;1,400&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:      #f5f0e8;
+  --surface: #fffdf8;
+  --panel:   #eee8d8;
+  --border:  #d4c9a8;
+  --gold:    #b8860b;
+  --gold2:   #d4a820;
+  --gold-lt: #f0d060;
+  --text:    #2a1f0a;
+  --dim:     #7a6a4a;
+  --shadow:  rgba(80,60,20,0.18);
+  --tray-h:  96px;    /* height of each piece tray — tune here */
+}
+
+html, body {
+  width:100%; height:100%; overflow:hidden;
+  background:var(--bg);
+  font-family:'Nunito',sans-serif;
+  color:var(--text);
+  user-select:none; -webkit-user-select:none;
+}
+
+/* ── SIDEBAR ───────────────────────────────── */
+#sidebar {
+  position:fixed; top:0; left:0; height:100%; width:270px;
+  background:var(--surface); border-right:2px solid var(--border);
+  box-shadow:4px 0 20px var(--shadow);
+  z-index:200; display:flex; flex-direction:column;
+  transform:translateX(0);
+  transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+#sidebar.hidden { transform:translateX(-270px); }
+#sb-head { background:linear-gradient(135deg,var(--gold),var(--gold2)); padding:16px; text-align:center; }
+#sb-head h2 { font-family:'Philosopher',serif; font-size:0.95rem; color:#fff; letter-spacing:2px; text-transform:uppercase; }
+#sb-body { flex:1; overflow-y:auto; padding:16px 14px; display:flex; flex-direction:column; gap:16px; }
+#sb-body::-webkit-scrollbar { width:4px; }
+#sb-body::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+
+.lbl { font-size:0.67rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--gold); margin-bottom:5px; }
+
+select, .btn {
+  width:100%; font-family:'Nunito',sans-serif; font-size:0.87rem;
+  padding:8px 12px; border:1.5px solid var(--border); border-radius:8px;
+  background:var(--panel); color:var(--text); cursor:pointer; outline:none;
+  transition:border-color 0.2s; appearance:none; -webkit-appearance:none;
+}
+select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23b8860b' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center; padding-right:28px; }
+select:hover { border-color:var(--gold2); }
+.btn-start { background:linear-gradient(135deg,var(--gold),var(--gold2)); color:#fff; border-color:var(--gold); font-weight:700; letter-spacing:1px; box-shadow:0 3px 12px rgba(184,134,11,0.3); }
+.btn-start:hover { filter:brightness(1.08); }
+.btn-sec { color:var(--dim); font-weight:600; font-size:0.82rem; }
+.btn-sec:hover { border-color:var(--gold); color:var(--gold); }
+
+.slider-row { display:flex; align-items:center; gap:8px; }
+.slider-row input[type=range] { flex:1; padding:0; border:none; background:none; accent-color:var(--gold); cursor:pointer; }
+.slider-v { font-size:0.78rem; font-weight:700; color:var(--gold); width:34px; text-align:right; }
+
+.stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.stat-box { background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:7px 10px; text-align:center; }
+.stat-box .v { font-size:1.15rem; font-weight:700; color:var(--gold); line-height:1; }
+.stat-box .k { font-size:0.62rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--dim); margin-top:2px; }
+.prog-wrap { background:var(--panel); border:1px solid var(--border); border-radius:20px; height:9px; overflow:hidden; }
+.prog-bar  { height:100%; background:linear-gradient(90deg,var(--gold),var(--gold-lt)); border-radius:20px; width:0%; transition:width 0.4s; }
+#imgPreview { width:100%; border-radius:8px; border:1.5px solid var(--border); object-fit:cover; display:none; max-height:120px; }
+
+/* ── SIDEBAR TAB ───────────────────────────── */
+#sbTab {
+  position:fixed; top:50%; left:270px; transform:translateY(-50%);
+  z-index:201; width:24px; height:60px;
+  background:linear-gradient(180deg,var(--gold),var(--gold2));
+  border-radius:0 10px 10px 0; border:none; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:3px 0 10px var(--shadow);
+  transition:left 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+#sbTab.hidden { left:0; }
+#sbTab svg { transition:transform 0.35s; }
+#sbTab.hidden svg { transform:rotate(180deg); }
+
+/* ── MAIN 3-ROW LAYOUT ─────────────────────── */
+#app {
+  position:fixed; inset:0; left:270px;
+  display:flex; flex-direction:column;
+  transition:left 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+#app.full { left:0; }
+
+/* Piece trays */
+.tray {
+  flex:0 0 var(--tray-h); height:var(--tray-h);
+  overflow-x:auto; overflow-y:hidden;
+  display:flex; align-items:center; gap:6px; padding:6px 8px;
+  background:var(--panel);
+  scrollbar-width:thin; scrollbar-color:var(--border) transparent;
+}
+#trayTop { border-bottom:1px solid var(--border); }
+#trayBot { border-top:1px solid var(--border); }
+.tray::-webkit-scrollbar { height:4px; }
+.tray::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+
+/* Tray thumbnail canvases */
+.tray-piece {
+  flex:0 0 auto; border-radius:4px; cursor:grab; display:block;
+  box-shadow:1px 2px 6px rgba(0,0,0,0.22);
+  border:1.5px solid transparent;
+  touch-action:none;
+  transition:border-color 0.12s;
+}
+.tray-piece:hover { border-color:var(--gold2); }
+.tray-piece.gone  { visibility:hidden; pointer-events:none; }
+
+/* Board row */
+#boardRow {
+  flex:1 1 0; position:relative; overflow:hidden;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--bg);
+  background-image:
+    radial-gradient(ellipse at 30% 20%,rgba(184,134,11,0.05) 0%,transparent 60%),
+    radial-gradient(ellipse at 75% 80%,rgba(184,134,11,0.04) 0%,transparent 50%);
+}
+
+/* Board */
+#boardContainer {
+  position:relative; border-radius:6px; overflow:hidden;
+  box-shadow:0 6px 36px var(--shadow), 0 0 0 2px var(--border);
+  flex-shrink:0;
+}
+#ghostCanvas { position:absolute; inset:0; pointer-events:none; z-index:0; }
+#slotLayer   { position:absolute; inset:0; pointer-events:none; z-index:1; }
+.slot { position:absolute; border:1px dashed rgba(184,134,11,0.22); transition:background 0.12s; }
+.slot.hover  { background:rgba(184,134,11,0.13); border-color:rgba(184,134,11,0.5); }
+.slot.filled { border-color:transparent; }
+.placed-piece { position:absolute; pointer-events:none; z-index:3; display:block; }
+
+/* Flying drag piece — lives in a fixed overlay */
+#dragLayer { position:fixed; inset:0; pointer-events:none; z-index:500; }
+#flyPiece  {
+  position:absolute; display:none; pointer-events:none;
+  border-radius:4px;
+  box-shadow:6px 10px 28px rgba(0,0,0,0.38), 0 0 0 2px var(--gold2);
+  transform:scale(1.06) rotate(1.2deg);
+}
+
+/* Welcome */
+#welcome {
+  position:absolute; inset:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:12px; color:var(--dim); text-align:center; padding:30px;
+}
+.w-icon { font-size:3.5rem; opacity:0.22; }
+.w-txt  { font-family:'Philosopher',serif; font-size:1rem; opacity:0.5; line-height:1.6; }
+
+/* Completion */
+#doneOverlay {
+  display:none; position:fixed; inset:0; z-index:600;
+  background:rgba(250,245,230,0.86); backdrop-filter:blur(5px);
+  align-items:center; justify-content:center;
+}
+#doneOverlay.show { display:flex; }
+.done-box {
+  background:var(--surface); border:2px solid var(--gold2); border-radius:18px;
+  padding:44px 52px; text-align:center; box-shadow:0 18px 56px var(--shadow);
+  animation:popIn 0.45s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes popIn { from{transform:scale(0.5);opacity:0} to{transform:scale(1);opacity:1} }
+.done-icon  { font-size:2.8rem; margin-bottom:8px; }
+.done-title { font-family:'Philosopher',serif; font-size:1.9rem; color:var(--gold); margin-bottom:4px; }
+.done-sub   { font-size:0.82rem; color:var(--dim); letter-spacing:2px; text-transform:uppercase; margin-bottom:20px; }
+.done-stats { font-size:0.92rem; color:var(--dim); line-height:2.1; margin-bottom:24px; }
+.done-stats strong { color:var(--gold); }
+.btn-again  { background:linear-gradient(135deg,var(--gold),var(--gold2)); color:#fff; border:none; padding:11px 32px; border-radius:50px; font-weight:700; font-size:0.92rem; cursor:pointer; box-shadow:0 4px 14px rgba(184,134,11,0.38); }
+.btn-again:hover { filter:brightness(1.08); }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div id="sb-head"><h2>🧩 Controls</h2></div>
+  <div id="sb-body">
+    <div><div class="lbl">Select Image</div><select id="imgSel"><option value="">Loading…</option></select></div>
+    <div><img id="imgPreview" alt="preview"></div>
+    <div>
+      <div class="lbl">Pieces</div>
+      <select id="piecesSel">
+        <option value="12">12 Pieces (4×3)</option>
+        <option value="24" selected>24 Pieces (6×4)</option>
+        <option value="36">36 Pieces (6×6)</option>
+      </select>
+    </div>
+    <div>
+      <div class="lbl">Ghost Opacity</div>
+      <div class="slider-row">
+        <input type="range" id="ghostSlider" min="0" max="50" value="18" step="1">
+        <span class="slider-v" id="ghostVal">18%</span>
+      </div>
+    </div>
+    <div><button class="btn btn-start" id="startBtn">▶ Start Puzzle</button></div>
+    <div><button class="btn btn-sec"   id="shuffleBtn" disabled>⇄ Shuffle Pieces</button></div>
+    <div class="stat-grid">
+      <div class="stat-box"><div class="v" id="sPlaced">0</div><div class="k">Placed</div></div>
+      <div class="stat-box"><div class="v" id="sTotal">0</div><div class="k">Total</div></div>
+      <div class="stat-box"><div class="v" id="sMoves">0</div><div class="k">Moves</div></div>
+      <div class="stat-box"><div class="v" id="sTime">0:00</div><div class="k">Time</div></div>
+    </div>
+    <div><div class="lbl">Progress</div><div class="prog-wrap"><div class="prog-bar" id="progBar"></div></div></div>
+  </div>
+</div>
+
+<!-- SIDEBAR TAB -->
+<button id="sbTab" title="Toggle controls">
+  <svg width="9" height="15" viewBox="0 0 9 15" fill="none">
+    <polyline points="7,1 2,7.5 7,14" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</button>
+
+<!-- MAIN APP: top-tray | board | bot-tray -->
+<div id="app">
+  <div class="tray" id="trayTop"></div>
+  <div id="boardRow">
+    <div id="welcome">
+      <div class="w-icon">🧩</div>
+      <div class="w-txt">Choose an image &amp; press <strong>Start Puzzle</strong></div>
+    </div>
+    <div id="boardContainer" style="display:none;">
+      <canvas id="ghostCanvas"></canvas>
+      <div id="slotLayer"></div>
+    </div>
+  </div>
+  <div class="tray" id="trayBot"></div>
+</div>
+
+<!-- DRAG OVERLAY -->
+<div id="dragLayer"><canvas id="flyPiece"></canvas></div>
+
+<!-- COMPLETION -->
+<div id="doneOverlay">
+  <div class="done-box">
+    <div class="done-icon">🎉</div>
+    <div class="done-title">Puzzle Complete!</div>
+    <div class="done-sub">Well Done</div>
+    <div class="done-stats">Pieces: <strong id="dPieces"></strong><br>Moves: <strong id="dMoves"></strong><br>Time: <strong id="dTime"></strong></div>
+    <button class="btn-again" onclick="closeDone()">Play Again</button>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   CONFIG  (globals you can tweak)
+══════════════════════════════════════════ */
+const BASE_URL   = 'https://sankalmuk.github.io/kids/Jigsaw/';
+const SNAP_PX    = 32;
+let   GHOST_ALPHA = 0.18;
+
+const GRIDS = {
+  12:{cols:4,rows:3},
+  24:{cols:6,rows:4},
+  36:{cols:6,rows:6},
+};
+
+/* ══════════════════════════════════════════
+   URL PARAMS
+══════════════════════════════════════════ */
+const urlP   = new URLSearchParams(window.location.search);
+const FOLDER = (urlP.get('q') || 'Krishna').trim();
+const MAXIMG = parseInt(urlP.get('c') || '20', 10);
+document.title = `${FOLDER} Jigsaw Puzzle`;
+
+/* ══════════════════════════════════════════
+   STATE
+══════════════════════════════════════════ */
+let gameImg=null, pieces=[];
+let cols=6, rows=4;
+let boardW=0, boardH=0, pieceW=0, pieceH=0;
+let boardOffX=0, boardOffY=0;   // boardContainer top-left in viewport
+let placed=0, moves=0, startTime=null, timerID=null;
+
+/* ══════════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════════ */
+const sidebar = document.getElementById('sidebar');
+const sbTab   = document.getElementById('sbTab');
+const appEl   = document.getElementById('app');
+let sbOpen = true;
+
+sbTab.addEventListener('click', () => {
+  sbOpen = !sbOpen;
+  applyOpen();
+});
+
+function applyOpen() {
+  sidebar.classList.toggle('hidden', !sbOpen);
+  sbTab.classList.toggle('hidden', !sbOpen);
+  sbTab.style.left = sbOpen ? '270px' : '0px';
+  appEl.classList.toggle('full', !sbOpen);
+}
+function hideSidebar() { sbOpen=false; applyOpen(); }
+
+if (window.innerWidth < 600) hideSidebar();
+
+/* ══════════════════════════════════════════
+   GHOST SLIDER
+══════════════════════════════════════════ */
+document.getElementById('ghostSlider').addEventListener('input', e => {
+  GHOST_ALPHA = e.target.value / 100;
+  document.getElementById('ghostVal').textContent = e.target.value + '%';
+  if (gameImg) redrawGhost();
+});
+
+/* ══════════════════════════════════════════
+   IMAGE PROBING
+══════════════════════════════════════════ */
+async function probeImages() {
+  const sel = document.getElementById('imgSel');
+  sel.innerHTML = '<option value="">Checking…</option>';
+  const jobs = Array.from({length:MAXIMG},(_,i) => {
+    const f = `${FOLDER}${String(i+1).padStart(2,'0')}.jpg`;
+    return new Promise(res => {
+      const img = new Image();
+      img.onload  = ()=>res(f);
+      img.onerror = ()=>res(null);
+      img.src = `${BASE_URL}${FOLDER}/${f}`;
+    });
+  });
+  const found = (await Promise.all(jobs)).filter(Boolean);
+  sel.innerHTML = '';
+  if (!found.length) { sel.innerHTML='<option>No images found</option>'; return; }
+  found.forEach(f => {
+    const o=document.createElement('option');
+    o.value=f; o.textContent=f.replace(/\.jpg$/i,'');
+    sel.appendChild(o);
+  });
+  updatePreview();
+}
+
+function updatePreview() {
+  const f=document.getElementById('imgSel').value;
+  const p=document.getElementById('imgPreview');
+  if(!f){p.style.display='none';return;}
+  p.src=`${BASE_URL}${FOLDER}/${f}`;
+  p.style.display='block';
+}
+document.getElementById('imgSel').addEventListener('change', updatePreview);
+
+/* ══════════════════════════════════════════
+   START
+══════════════════════════════════════════ */
+document.getElementById('startBtn').addEventListener('click', () => {
+  const f = document.getElementById('imgSel').value;
+  if (!f) { alert('Choose an image first.'); return; }
+  const g = GRIDS[parseInt(document.getElementById('piecesSel').value)] || GRIDS[24];
+  cols=g.cols; rows=g.rows;
+  clearGameTimer();
+  pieces=[]; placed=0; moves=0;
+  document.getElementById('shuffleBtn').disabled=false;
+  updateStats();
+  hideSidebar();
+  const img=new Image();
+  img.crossOrigin='anonymous';
+  img.onload=()=>{ gameImg=img; setTimeout(buildPuzzle,400); };
+  img.onerror=()=>alert('Could not load image.');
+  img.src=`${BASE_URL}${FOLDER}/${f}`;
+});
+
+document.getElementById('shuffleBtn').addEventListener('click', refillTrays);
+
+/* ══════════════════════════════════════════
+   BUILD PUZZLE
+══════════════════════════════════════════ */
+function trayHeightPx() {
+  // Read CSS variable --tray-h
+  return parseInt(getComputedStyle(document.documentElement)
+    .getPropertyValue('--tray-h')) || 96;
+}
+
+function buildPuzzle() {
+  const trayH  = trayHeightPx();
+  const aW     = appEl.clientWidth;
+  const aH     = appEl.clientHeight;
+  const rowH   = aH - trayH * 2;   // height available for board
+  const pad    = 10;
+
+  /* Board size — respect image aspect ratio */
+  const imgR = gameImg.naturalWidth / gameImg.naturalHeight;
+  let bw = aW - pad*2;
+  let bh = bw / imgR;
+  if (bh > rowH - pad*2) { bh=rowH-pad*2; bw=bh*imgR; }
+  // snap to grid multiples
+  bw = Math.floor(bw/cols)*cols;
+  bh = Math.floor(bh/rows)*rows;
+  boardW=bw; boardH=bh; pieceW=bw/cols; pieceH=bh/rows;
+
+  /* Setup boardContainer */
+  const bc=document.getElementById('boardContainer');
+  bc.style.display='block';
+  bc.style.width=boardW+'px'; bc.style.height=boardH+'px';
+  bc.querySelectorAll('.placed-piece').forEach(e=>e.remove());
+
+  /* Ghost */
+  const gc=document.getElementById('ghostCanvas');
+  gc.width=boardW; gc.height=boardH;
+  redrawGhost();
+
+  /* Slots */
+  buildSlots();
+
+  /* Record board offset after next paint */
+  requestAnimationFrame(()=>{
+    const r=bc.getBoundingClientRect();
+    boardOffX=r.left; boardOffY=r.top;
+  });
+
+  /* Hide welcome */
+  document.getElementById('welcome').style.display='none';
+
+  /* Create pieces and shuffle */
+  pieces=[];
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++)
+    pieces.push({col:c,row:r,placed:false,trayEl:null,onTop:false});
+  for(let i=pieces.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [pieces[i],pieces[j]]=[pieces[j],pieces[i]];
+  }
+
+  fillTrays();
+
+  document.getElementById('sTotal').textContent=cols*rows;
+  document.getElementById('sPlaced').textContent=0;
+  document.getElementById('progBar').style.width='0%';
+  startTime=Date.now();
+  timerID=setInterval(tickTimer,1000);
+}
+
+/* ── Ghost ── */
+function redrawGhost() {
+  const gc=document.getElementById('ghostCanvas');
+  const ctx=gc.getContext('2d');
+  ctx.clearRect(0,0,gc.width,gc.height);
+  ctx.globalAlpha=GHOST_ALPHA;
+  ctx.drawImage(gameImg,0,0,gc.width,gc.height);
+}
+
+/* ── Slots ── */
+function buildSlots() {
+  const sl=document.getElementById('slotLayer');
+  sl.innerHTML='';
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+    const d=document.createElement('div');
+    d.className='slot';
+    d.style.left=c*pieceW+'px'; d.style.top=r*pieceH+'px';
+    d.style.width=pieceW+'px';  d.style.height=pieceH+'px';
+    d.dataset.c=c; d.dataset.r=r;
+    sl.appendChild(d);
+  }
+}
+function getSlot(c,r){ return document.querySelector(`.slot[data-c="${c}"][data-r="${r}"]`); }
+
+/* ══════════════════════════════════════════
+   TRAY MANAGEMENT
+══════════════════════════════════════════ */
+function makeTrayThumb(p) {
+  const tH  = trayHeightPx();
+  const maxH = tH - 12;
+  // scale so thumb fits tray height; never upscale
+  const scale = Math.min(maxH/pieceH, 1.0);
+  const tw=Math.round(pieceW*scale), th=Math.round(pieceH*scale);
+  const cv=document.createElement('canvas');
+  cv.width=tw; cv.height=th;
+  cv.style.width=tw+'px'; cv.style.height=th+'px';
+  cv.className='tray-piece';
+  const ctx=cv.getContext('2d');
+  const sx=gameImg.naturalWidth/boardW, sy=gameImg.naturalHeight/boardH;
+  ctx.drawImage(gameImg, p.col*pieceW*sx, p.row*pieceH*sy, pieceW*sx, pieceH*sy, 0,0,tw,th);
+  return cv;
+}
+
+function fillTrays() {
+  const tTop=document.getElementById('trayTop');
+  const tBot=document.getElementById('trayBot');
+  tTop.innerHTML=''; tBot.innerHTML='';
+  const unplaced=pieces.filter(p=>!p.placed);
+  const half=Math.ceil(unplaced.length/2);
+  unplaced.forEach((p,i)=>{
+    const cv=makeTrayThumb(p);
+    p.trayEl=cv; p.onTop=(i<half);
+    (p.onTop?tTop:tBot).appendChild(cv);
+    attachDrag(p);
+  });
+}
+
+function refillTrays() { fillTrays(); }
+
+/* ══════════════════════════════════════════
+   DRAG (pointer events, tray → board)
+══════════════════════════════════════════ */
+let drag=null;
+const flyEl=document.getElementById('flyPiece');
+
+function attachDrag(p) {
+  p.trayEl.addEventListener('pointerdown', e=>startDrag(e,p));
+}
+
+function startDrag(e,p) {
+  e.preventDefault();
+  p.trayEl.setPointerCapture(e.pointerId);
+
+  // Refresh board bounding rect
+  const bcR=document.getElementById('boardContainer').getBoundingClientRect();
+  boardOffX=bcR.left; boardOffY=bcR.top;
+
+  // Draw full-size piece on flyEl
+  flyEl.width=pieceW; flyEl.height=pieceH;
+  flyEl.style.width=pieceW+'px'; flyEl.style.height=pieceH+'px';
+  const ctx=flyEl.getContext('2d');
+  const sx=gameImg.naturalWidth/boardW, sy=gameImg.naturalHeight/boardH;
+  ctx.clearRect(0,0,pieceW,pieceH);
+  ctx.drawImage(gameImg, p.col*pieceW*sx, p.row*pieceH*sy, pieceW*sx, pieceH*sy, 0,0,pieceW,pieceH);
+  flyEl.style.display='block';
+  flyEl.style.left=(e.clientX-pieceW/2)+'px';
+  flyEl.style.top =(e.clientY-pieceH/2)+'px';
+
+  p.trayEl.classList.add('gone');
+  drag={p, oX:pieceW/2, oY:pieceH/2, origLeft:e.clientX-pieceW/2, origTop:e.clientY-pieceH/2};
+
+  p.trayEl.addEventListener('pointermove',   onMove);
+  p.trayEl.addEventListener('pointerup',     onUp);
+  p.trayEl.addEventListener('pointercancel', onUp);
+}
+
+function onMove(e) {
+  if(!drag) return;
+  const x=e.clientX-drag.oX, y=e.clientY-drag.oY;
+  flyEl.style.left=x+'px'; flyEl.style.top=y+'px';
+  highlightNear(x,y);
+}
+
+function onUp(e) {
+  if(!drag) return;
+  e.target.releasePointerCapture(e.pointerId);
+  e.target.removeEventListener('pointermove',   onMove);
+  e.target.removeEventListener('pointerup',     onUp);
+  e.target.removeEventListener('pointercancel', onUp);
+  clearHover();
+  flyEl.style.display='none';
+
+  const x=e.clientX-drag.oX, y=e.clientY-drag.oY;
+  const snapped=trySnap(drag.p, x, y);
+  if(!snapped) drag.p.trayEl.classList.remove('gone');
+  moves++; updateStats();
+  drag=null;
+}
+
+/* ── Snap ── */
+function trySnap(p, flyLeft, flyTop) {
+  const pcx=flyLeft+pieceW/2, pcy=flyTop+pieceH/2;
+  let best=null, bestD=SNAP_PX;
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+    if(slotOccupied(c,r)) continue;
+    const scx=boardOffX+c*pieceW+pieceW/2;
+    const scy=boardOffY+r*pieceH+pieceH/2;
+    const d=Math.hypot(pcx-scx,pcy-scy);
+    if(d<bestD){bestD=d;best={c,r};}
+  }
+  if(!best) return false;
+
+  const correct=(best.c===p.col && best.r===p.row);
+  if(correct){
+    // Paint permanently onto boardContainer
+    const cv=document.createElement('canvas');
+    cv.width=pieceW; cv.height=pieceH;
+    cv.style.left=best.c*pieceW+'px'; cv.style.top=best.r*pieceH+'px';
+    cv.style.width=pieceW+'px'; cv.style.height=pieceH+'px';
+    cv.className='placed-piece';
+    const ctx=cv.getContext('2d');
+    const sx=gameImg.naturalWidth/boardW, sy=gameImg.naturalHeight/boardH;
+    ctx.drawImage(gameImg, p.col*pieceW*sx, p.row*pieceH*sy, pieceW*sx, pieceH*sy, 0,0,pieceW,pieceH);
+    document.getElementById('boardContainer').appendChild(cv);
+    const sl=getSlot(best.c,best.r); if(sl) sl.classList.add('filled');
+    p.placed=true; p.placedCol=best.c; p.placedRow=best.r;
+    p.trayEl.remove();
+    placed++; updateStats();
+    if(placed===cols*rows) setTimeout(showDone,400);
+  } else {
+    // Wrong slot — brief red flash then return piece to tray
+    flyEl.style.outline='2px solid #c04040';
+    setTimeout(()=>{ flyEl.style.outline=''; },250);
+    p.trayEl.classList.remove('gone');
+  }
+  return true;
+}
+
+function slotOccupied(c,r){ return pieces.some(p=>p.placed&&p.placedCol===c&&p.placedRow===r); }
+
+function highlightNear(flyLeft,flyTop){
+  clearHover();
+  const pcx=flyLeft+pieceW/2, pcy=flyTop+pieceH/2;
+  let best=null, bestD=SNAP_PX*1.6;
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+    if(slotOccupied(c,r)) continue;
+    const d=Math.hypot(pcx-(boardOffX+c*pieceW+pieceW/2), pcy-(boardOffY+r*pieceH+pieceH/2));
+    if(d<bestD){bestD=d;best={c,r};}
+  }
+  if(best){ const sl=getSlot(best.c,best.r); if(sl) sl.classList.add('hover'); }
+}
+function clearHover(){ document.querySelectorAll('.slot.hover').forEach(s=>s.classList.remove('hover')); }
+
+/* ══════════════════════════════════════════
+   STATS & TIMER
+══════════════════════════════════════════ */
+function updateStats(){
+  document.getElementById('sPlaced').textContent=placed;
+  document.getElementById('sMoves').textContent=moves;
+  document.getElementById('progBar').style.width=(cols*rows>0?(placed/(cols*rows))*100:0)+'%';
+}
+function tickTimer(){
+  if(!startTime) return;
+  const s=Math.floor((Date.now()-startTime)/1000);
+  document.getElementById('sTime').textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+}
+function clearGameTimer(){ clearInterval(timerID); timerID=null; document.getElementById('sTime').textContent='0:00'; }
+
+/* ══════════════════════════════════════════
+   COMPLETION
+══════════════════════════════════════════ */
+function showDone(){
+  clearGameTimer();
+  const s=Math.floor((Date.now()-startTime)/1000);
+  document.getElementById('dPieces').textContent=cols*rows;
+  document.getElementById('dMoves').textContent=moves;
+  document.getElementById('dTime').textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+  document.getElementById('doneOverlay').classList.add('show');
+}
+function closeDone(){ document.getElementById('doneOverlay').classList.remove('show'); }
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+probeImages();
+</script>
+</body>
+</html>
