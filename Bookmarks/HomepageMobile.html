@@ -119,7 +119,7 @@ document.writeln(`
 }
 
 /* Default for Laptop */
-.title {background-color:var(--bg3); color:var(--fg3); font-size:2vw; padding:4pt;}
+.title {background-color:var(--bg3); color:var(--fg3); font-size:2vw; padding:2pt;}
 a, p, * {
   font-size: 1vw;
 }
@@ -129,7 +129,7 @@ a, p, * {
   a, p, * {
     font-size: 3vw;
   }
-  .title {background-color:var(--bg3); color:var(--fg3); font-size:4vw;}
+  .title {background-color:var(--bg3); color:var(--fg3); font-size:3vw;}
 }
 
 /* Mobile Phones (max-width: 768px) */
@@ -137,7 +137,7 @@ a, p, * {
   a, p, * {
     font-size: 4vw;
   }
-  .title {background-color:var(--bg3); color:var(--fg3); font-size:6vw;}
+  .title {background-color:var(--bg3); color:var(--fg3); font-size:4vw;}
 }
 
 .flex1 {display:flex; flex-wrap:wrap; align-items:center flex-wrap:wrap; border-bottom:1px dotted;}
@@ -151,9 +151,19 @@ a:hover {background-color:var(--bg4); color:var(--fg4); xpadding:2pt 4pt;}
 </style>
 `);
 
-document.writeln("<div class='header title'><span class='title left'>Homepage</span><span class='right'><label class='title'>Theme:</label><select id='theme' name='theme' onchange='mysubmit()'>");
-for (var i = 0; i < themes.length; i++) document.writeln("<option " + ((i == theme) ? " SELECTED " : "") + " value=" + i + ">" + String.fromCharCode(65 + i) + " " + themes[i][0] + "</option>");
-document.writeln("</select></span></div>");</script>
+document.writeln("<div class='header title'>"+
+"<span class='title left'>Homepage</span>"+
+"<a href='" + "https://www.prokerala.com/astrology/tamil-panchangam/?la=ta" + "'><button title='Panchangam'>P</button></A>" +
+"<a href='" + "https://www.tamildailycalendar.com/tamil_daily_calendar.php" + "'><button title='Daily Sheet'>D</button></A>" +
+"<a href='" + "https://www.dinamalar.com/josiyam-astrology/tamil-month-calendar" + "'><button title='Monthly Calendar'>M</button></A>" +
+"<a href='" + "https://www.timeanddate.com/calendar/" + "'><button title='Yearly Calendar'>Y</button></A>" +
+"<span class='right'>"+
+"<select id='theme' name='theme' onchange='mysubmit()'>");
+
+for (var i = 0; i < themes.length; i++)
+	document.writeln("<option " + ((i == theme) ? " SELECTED " : "") + " value=" + i + ">" + String.fromCharCode(65 + i) + " " + themes[i][0] + "</option>");
+
+document.writeln("</select></span>" +	"</div>");</script>
 <div class='flex1'><div class='cat'>Tamil News</div>
 <div class='one'><a href='https://www.dinamalar.com/' >Dinamalar</a></div>
 <div class='one'><a href='http://www.maalaimalar.com/' >MalaiMalar</a></div>
