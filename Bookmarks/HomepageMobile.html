@@ -4,7 +4,7 @@
 <meta charset='UTF-8' />
 <title>HomePage</title>
 <body>
-<script>      //           0                  1          2          3          4          5         6        7        8        9        10            11
+<script>//     0                  1        2         3          4        5         6          7        8         9         10        11        12
    var themes = [
     ["vba"           ,"#303E45","#435761","#57707D","#9EB1BB","#DFE5E8","#F5F7F8","#FFFFFF","#FFFFFF","#FFFFFF","#000000","#000000","#000000"],
     ["blue"          ,"#074B83","#0A69B7","#0C87EB","#79BFF8","#D2EAFD","#F2F9FE","#FFFFFF","#FFFFFF","#FFFFFF","#000000","#000000","#000000"],
@@ -78,22 +78,16 @@ if (urlParams.has('theme') && urlParams.get('theme') !== '') {
 
 function mysubmit()
 {
-
 	var x1 = document.getElementById("theme").value;
-	    localStorage.setItem('theme', x1);
-		location.reload();
-	// alert("You clicked "+x1);
+	localStorage.setItem('theme', x1);
+	location.reload();
 }
-
-// For verification
-console.log("Theme value:", x1);
 
 var theme = x1;
 var color = themes[theme];
 
 document.writeln(`
 <style>
-
 :root {
 --bg1:${color[1]} ; --fg1:${color[7]} ;
 --bg2:${color[2]} ; --fg2:${color[8]} ;
@@ -110,19 +104,13 @@ document.writeln(`
   padding: 0 10px;            /* optional spacing */
 }
 
-.left {
-  text-align: left;
-}
+.left { text-align: left; }
 
-.right {
-  text-align: right;
-}
+.right { text-align: right; }
 
 /* Default for Laptop */
 .title {background-color:var(--bg3); color:var(--fg3); font-size:3vw; padding:3pt;}
-a, p, * {
-  font-size: 1vw;
-}
+a, p, * { font-size: 1vw; }
 
 /* Tablets (max-width: 1024px) */
 @media (max-width: 1024px) {
@@ -144,29 +132,29 @@ a, p, * {
 .flex1 div { padding:2pt 4pt; border-right:1px solid var(--bg3); }
 .cat {font-weight:bold; flex-basis:10%; padding:2pt; text-align:center; background-color:var(--bg2); color:var(--fg2); border-bottom:1px solid var(--bg6); white-space: nowrap;}
 .head {background-color:var(--bg3); color:var(--fg3);}
-
 .one {xwidth:90px;}
 a {text-decoration:none; color:black; padding:2pt 4pt;display:block;}
 a:hover {background-color:var(--bg4); color:var(--fg4); xpadding:2pt 4pt;}
 </style>
 `);
 
-
-
 document.writeln("<div class='header title'>"+
 "<span class='title left'>Homepage</span>"+
 "<span class='right'>"+
-"<select id='theme' name='theme' onchange='mysubmit()'>");
+"<b>Theme:</b> <select id='theme' name='theme' onchange='mysubmit()'>");
 
 for (var i = 0; i < themes.length; i++)
 	document.writeln("<option " + ((i == theme) ? " SELECTED " : "") + " value=" + i + ">" + String.fromCharCode(65 + i) + " " + themes[i][0] + "</option>");
 
-document.writeln("</select></span>" +	"</div>");</script>
+document.writeln("</select></span>" +	"</div>");
+</script>
 <div class='flex1'><div class='cat'>Quick</div>
 <div class='one'><a href='https://www.prokerala.com/astrology/tamil-panchangam/?la=ta'  title='Panchangam' >Panchangam</a></div>
 <div class='one'><a href='https://www.tamildailycalendar.com/tamil_daily_calendar.php'  title='Dailysheet calendar' >Daily</a></div>
 <div class='one'><a href='https://www.dinamalar.com/josiyam-astrology/tamil-month-calendar'  title='Monthly calendar' >Monthly</a></div>
-<div class='one'><a href='https://www.timeanddate.com/calendar/'  title='Yearly calendar' >Yearly</a></div></div>
+<div class='one'><a href='https://www.timeanddate.com/calendar/'  title='Yearly calendar' >Yearly</a></div>
+<div class='one'><a href='http://www.google.com/'  title='Google Search' >Google</a></div>
+<div class='one'><a href='https://chat.openai.com/'  title='ChatGPT AI' >ChatGPT</a></div></div>
 <div class='flex1'><div class='cat'>Tamil News</div>
 <div class='one'><a href='https://www.dinamalar.com/' >Dinamalar</a></div>
 <div class='one'><a href='http://www.maalaimalar.com/' >MalaiMalar</a></div>
@@ -287,7 +275,8 @@ document.writeln("</select></span>" +	"</div>");</script>
 <div class='one'><a href='https://www.jiomart.com/' >JIOMart</a></div>
 <div class='one'><a href='https://www.ajio.com/' >AJIO</a></div>
 <div class='one'><a href='https://shop.bharathisystems.com/' >Refurbished</a></div>
-<div class='one'><a href='https://usedlaptopstore.in/' >Infocomm</a></div></div>
+<div class='one'><a href='https://usedlaptopstore.in/' >Infocomm</a></div>
+<div class='one'><a href='https://reboot-it.com.au/' >RebootIT</a></div></div>
 <div class='flex1'><div class='cat'>Travel Planning</div>
 <div class='one'><a href='https://www.irctc.co.in/nget/train-search'  title='sankalmuk@gmail.com' >IRCTC</a></div>
 <div class='one'><a href='http://www.indianrail.gov.in/enquiry/PNR/PnrEnquiry.html?locale=en'  title='PNR Enquiry' >PNREnq</a></div>
