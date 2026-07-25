@@ -2,7 +2,7 @@
 <html>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
 <meta charset='UTF-8' />
-<title>HomePage</title>
+<title>HomepageMobile</title>
 <body>
 <script>//     0                  1        2         3          4        5         6          7        8         9         10        11        12
    var themes = [
@@ -97,6 +97,9 @@ document.writeln(`
 --bg6:${color[6]} ; --fg6:${color[12]} ;
 }
 
+.even_row { background-color : var(--bg5); color : var(--fg5); }
+.odd_row { background-color : var(--bg6); color : var(--fg6); }
+
 .header {
   display: flex;              /* enables flexbox */
   justify-content: space-between; /* pushes items to opposite ends */
@@ -137,6 +140,8 @@ a, p, * { font-size: 1vw; }
 .one {xwidth:90px;}
 a {text-decoration:none; color:inherit; padding:2pt 4pt;display:block;}
 a:hover {background-color:var(--bg4); color:var(--fg4); xpadding:2pt 4pt;}
+
+
 </style>
 `);
 
@@ -150,14 +155,14 @@ for (var i = 0; i < themes.length; i++)
 
 document.writeln("</select></span>" +	"</div>");
 </script>
-<div class='flex1' ><div class='cat' >Quick</div>
+<div class='flex1 odd_row' ><div class='cat' >Quick</div>
 <div ><a href='http://www.google.com/'  title='Google Search' >Google</a></div>
 <div ><a href='https://chat.openai.com/'  title='ChatGPT AI' >ChatGPT</a></div>
 <div ><a href='https://www.prokerala.com/astrology/tamil-panchangam/?la=ta'  title='Panchangam' >Panchangam</a></div>
 <div ><a href='https://www.tamildailycalendar.com/tamil_daily_calendar.php'  title='Dailysheet calendar' >Daily</a></div>
 <div ><a href='https://www.dinamalar.com/josiyam-astrology/tamil-month-calendar'  title='Monthly calendar' >Monthly</a></div>
 <div ><a href='https://www.timeanddate.com/calendar/'  title='Yearly calendar' >Yearly</a></div></div>
-<div class='flex1' ><div class='cat' >Tamil News</div>
+<div class='flex1 even_row' ><div class='cat' >Tamil News</div>
 <div ><a href='https://www.dinamalar.com/' >Dinamalar</a></div>
 <div ><a href='http://www.maalaimalar.com/' >MalaiMalar</a></div>
 <div ><a href='http://www.dailythanthi.com/' >DinaThanthi</a></div>
@@ -167,7 +172,7 @@ document.writeln("</select></span>" +	"</div>");
 <div ><a href='http://tamil.thehindu.com/' >Hindu (Tamil)</a></div>
 <div ><a href='http://www.thinaboomi.com/' >DinaBoomi</a></div>
 <div ><a href='http://www.dinakaran.com/' >Dinakaran</a></div></div>
-<div class='flex1' ><div class='cat' >National News</div>
+<div class='flex1 odd_row' ><div class='cat' >National News</div>
 <div ><a href='http://www.ndtv.com/' >NDTV</a></div>
 <div ><a href='http://www.rediff.com/' >Rediff</a></div>
 <div ><a href='https://www.newindianexpress.com/' >NIE</a></div>
@@ -177,7 +182,7 @@ document.writeln("</select></span>" +	"</div>");
 <div ><a href='http://www.deccanchronicle.com/' >Deccan</a></div>
 <div ><a href='http://timesofindia.indiatimes.com/?' >Times Of India</a></div>
 <div ><a href='http://news.google.co.in/nwshp?hl=en&tab=wn&q=' >Google News</a></div></div>
-<div class='flex1' ><div class='cat' >Countries</div>
+<div class='flex1 even_row' ><div class='cat' >Countries</div>
 <div ><a href='http://asia.cnn.com/' >CNN</a></div>
 <div ><a href='http://www.bbc.co.uk/?ok' >BBC</a></div>
 <div ><a href='http://www.straitstimes.com/global' >Singapore</a></div>
@@ -196,7 +201,7 @@ document.writeln("</select></span>" +	"</div>");
 <div ><a href='https://www.globaltimes.cn/'  title='Global Times China' >GTChina</a></div>
 <div ><a href='http://www.chinadaily.com.cn/'  title='China Daily' >CD</a></div>
 <div ><a href='https://www.aljazeera.com/tag/taliban/'  title='Afghan' >Afghan</a></div></div>
-<div class='flex1' ><div class='cat' >Financial News</div>
+<div class='flex1 odd_row' ><div class='cat' >Financial News</div>
 <div ><a href='http://www.moneycontrol.com/' >Money Central</a></div>
 <div ><a href='http://money.rediff.com/money/jsp/markets_home.jsp' >Rediff Fin</a></div>
 <div ><a href='http://profit.ndtv.com/' >NDTV</a></div>
@@ -208,7 +213,7 @@ document.writeln("</select></span>" +	"</div>");
 <div ><a href='http://www.nse-india.com/'  title='National Stock Exchange of India' >NSE</a></div>
 <div ><a href='http://www.bseindia.com/'  title='Bombay Stock Exchange' >BSE</a></div>
 <div ><a href='http://www.ratekhoj.com/fixed-deposits/index.php/index.php' >RateKhoj</a></div></div>
-<div class='flex1' ><div class='cat' >Sports</div>
+<div class='flex1 even_row' ><div class='cat' >Sports</div>
 <div ><a href='http://www.espncricinfo.com/' >CricInfo</a></div>
 <div ><a href='http://stats.cricinfo.com/ci/content/records/216972.html' >Stats</a></div>
 <div ><a href='https://www.cricbuzz.com/' >Cricbuzz</a></div>
@@ -216,7 +221,7 @@ document.writeln("</select></span>" +	"</div>");
 <div ><a href='http://www.hotstar.com/#!/featured-sports'  title='HotStar Live TV' >HotStar</a></div>
 <div ><a href='http://cricbox.co/sky-sports-2-live'  title='CricBox' >CricBox</a></div>
 <div ><a href='http://www.iplt20.com/'  title='IPLT20' >IPLT20</a></div></div>
-<div class='flex1' ><div class='cat' >Search and Mail</div>
+<div class='flex1 odd_row' ><div class='cat' >Search and Mail</div>
 <div ><a href='http://www.google.com/' >Google</a></div>
 <div ><a href='http://www.youtube.com' >YouTube</a></div>
 <div ><a href='https://play.google.com/store' >GooglePlay</a></div>
@@ -229,7 +234,7 @@ document.writeln("</select></span>" +	"</div>");
 <div ><a href='https://outlook.live.com/mail/' >Hotmail</a></div>
 <div ><a href='http://www.blogger.com/start' >Blogger</a></div>
 <div ><a href='http://sankalmuk.blogspot.com/' >Sankar Blog</a></div></div>
-<div class='flex1' ><div class='cat' >AI Tools</div>
+<div class='flex1 even_row' ><div class='cat' >AI Tools</div>
 <div ><a href='https://chat.openai.com/'  title='ChatGPT' >ChatGPT</a></div>
 <div ><a href='https://gemini.google.com/app'  title='GeminiAI' >GeminiAI</a></div>
 <div ><a href='https://claude.ai/onboarding'  title='Claude' >Claude</a></div>
@@ -246,7 +251,7 @@ document.writeln("</select></span>" +	"</div>");
 <div ><a href='https://prompts.chat/'  title='Prompts Chat - Sample Prompts' >Prompts</a></div>
 <div ><a href='https://claude.com/resources/use-cases'  title='Claude Use Cases' >UseCases</a></div>
 <div ><a href='https://anthropic.skilljar.com/'  title='Anthropic Skill jar' >SkillJar</a></div></div>
-<div class='flex1' ><div class='cat' >Banking</div>
+<div class='flex1 odd_row' ><div class='cat' >Banking</div>
 <div ><a href='http://www.icicibank.com/'  title='505904393' >ICICI</a></div>
 <div ><a href='http://www.hdfcbank.com/personal/default.htm'  title='AMXPP5736H' >HDFC</a></div>
 <div ><a href='https://www.iob.bank.in/en/'  title='Indian Overseas Bank' >IOB</a></div>
@@ -265,13 +270,13 @@ document.writeln("</select></span>" +	"</div>");
 <div ><a href='http://www.national.com.au/'  title='National Australia Bank' >NAB</a></div>
 <div ><a href='https://www.ingdirect.com.au/'  title='10698077<BR>12601711' >ING</a></div>
 <div ><a href='http://www.commbank.com.au/default.asp'  title='CommonWealth Bank Australia' >CWealth</a></div></div>
-<div class='flex1' ><div class='cat' >Tax</div>
+<div class='flex1 even_row' ><div class='cat' >Tax</div>
 <div ><a href='https://www.incometaxindiaefiling.gov.in/home'  title='Income Tax Department of India' >Income Tax</a></div>
 <div ><a href='http://www.chennaicorporation.gov.in/online-civic-services/index.htm' >ChennaiPropTax</a></div>
 <div ><a href='https://bnc.chennaimetrowater.in/#/public/cus-login' >ChennaiWaterTax</a></div>
 <div ><a href='https://tnurbanepay.tn.gov.in/LoginPage.aspx' >TirchyWaterTax</a></div>
 <div ><a href='https://myaadhaar.uidai.gov.in/' >Aadhar</a></div></div>
-<div class='flex1' ><div class='cat' >Shopping</div>
+<div class='flex1 odd_row' ><div class='cat' >Shopping</div>
 <div ><a href='http://www.flipkart.com/' >FlipKart</a></div>
 <div ><a href='http://www.amazon.in/'  title='type message center in search to contact support' >Amazon</a></div>
 <div ><a href='https://www.jiomart.com/' >JIOMart</a></div>
@@ -279,7 +284,7 @@ document.writeln("</select></span>" +	"</div>");
 <div ><a href='https://shop.bharathisystems.com/' >Refurbished</a></div>
 <div ><a href='https://usedlaptopstore.in/' >Infocomm</a></div>
 <div ><a href='https://reboot-it.com.au/' >RebootIT</a></div></div>
-<div class='flex1' ><div class='cat' >Travel Planning</div>
+<div class='flex1 even_row' ><div class='cat' >Travel Planning</div>
 <div ><a href='https://www.irctc.co.in/nget/train-search'  title='sankalmuk@gmail.com' >IRCTC</a></div>
 <div ><a href='http://www.indianrail.gov.in/enquiry/PNR/PnrEnquiry.html?locale=en'  title='PNR Enquiry' >PNREnq</a></div>
 <div ><a href='http://enquiry.indianrail.gov.in/ntes/'  title='National Train Enquiry System ' >TrackTrain</a></div>
@@ -291,7 +296,7 @@ document.writeln("</select></span>" +	"</div>");
 <div ><a href='https://rathimeena.co.in/rathisite/newsite/index.jsp' >RathiMeena</a></div>
 <div ><a href='http://www.tpcindia.com/' >ProfCourier</a></div>
 <div ><a href='https://www.indiapost.gov.in/' >IndiaPost</a></div></div>
-<div class='flex1' ><div class='cat' >Religion</div>
+<div class='flex1 odd_row' ><div class='cat' >Religion</div>
 <div ><a href='http://www.iskcon.net.au/' >Melb.Temple</a></div>
 <div ><a href='http://www.kamakoti.org/' >KanchiMat</a></div>
 <div ><a href='http://www.sringeri.net/' >Sringeri</a></div>
@@ -299,7 +304,7 @@ document.writeln("</select></span>" +	"</div>");
 <div ><a href='http://www.sivanandadlshq.org/home.html' >Sivananda</a></div>
 <div ><a href='http://www.tamilsurangam.com/literatures/shaivam_literatures.html'  title='Good Collection of eBooks' >Tirumurai</a></div>
 <div ><a href='http://www.thevaaram.org/index.php'  title='Thevaram With meaning' >Thevaram</a></div></div>
-<div class='flex1' ><div class='cat' >Forums</div>
+<div class='flex1 even_row' ><div class='cat' >Forums</div>
 <div ><a href='http://libgen.li/index.php?columns[]=t&amp;objects[]=f&amp;topics[]=l&amp;res=100&amp;covers=on'  title='LibraryGenesis' >LibraryGenesis</a></div>
 <div ><a href='https://archive.org/'  title='Archive ORG' >Archive</a></div>
 <div ><a href='https://www.1tamilrockers.app/'  title='https://tamilmv.unblockit.ch/ https://www.1tamilmv.one/ https://tamilmv.unblockit.app/ https://tamilmv.unblockit.bz/' >TRock</a></div>
@@ -318,7 +323,7 @@ document.writeln("</select></span>" +	"</div>");
 <div ><a href='https://www.5movierulz.voyage/'  title='movierulz' >movierulz</a></div>
 <div ><a href='https://www.jeyamohan.in/'  title='Jayamohan Home page' >JM</a></div>
 <div ><a href='https://www.tamildigitallibrary.in/'  title='Tamil Books Library' >TamilLib</a></div></div>
-<div class='flex1' ><div class='cat' >Technology</div>
+<div class='flex1 odd_row' ><div class='cat' >Technology</div>
 <div ><a href='http://www.microsoft.com/ms.htm'  title='OS, MS Office etc' >Microsoft</a></div>
 <div ><a href='http://distrowatch.com/'  title='Operating system' >Linux</a></div>
 <div ><a href='http://www.oracle.com/'  title='OLTP Dabase' >Oracle</a></div>
@@ -339,7 +344,7 @@ document.writeln("</select></span>" +	"</div>");
 <div ><a href='https://www.canva.com/'  title='Canva' >Canva</a></div>
 <div ><a href='https://exceljet.net/excel-functions'  title='Excel Tips and Tricks' >ExcelJet</a></div>
 <div ><a href='https://core.telegram.org/bots/api'  title='Telegram Bot' >TelBot</a></div></div>
-<div class='flex1' ><div class='cat' >Tech Tools</div>
+<div class='flex1 even_row' ><div class='cat' >Tech Tools</div>
 <div ><a href='https://ifimageediting.com/image-to-text'  title='Image to text extraction' >ImgToTxt</a></div>
 <div ><a href='http://www.onlineocr.net/'  title='Extract Text From Image' >ImgToTxt2</a></div>
 <div ><a href='https://www.adobe.com/express/feature/image/remove-background'  title='Remove Background of graphics' >RemoveBG</a></div>
@@ -357,7 +362,7 @@ document.writeln("</select></span>" +	"</div>");
 <div ><a href='http://paletton.com'  title='Color Palatte Designer' >Paletton</a></div>
 <div ><a href='http://colrd.com/'  title='Color Palatte Designer' >Colrd</a></div>
 <div ><a href='https://color.adobe.com/create/color-wheel'  title='Color Palatte Designer' >AdobeClrs</a></div></div>
-<div class='flex1' ><div class='cat' >Misc Tools</div>
+<div class='flex1 odd_row' ><div class='cat' >Misc Tools</div>
 <div ><a href='https://www.tamillexicon.com/uc/libi-unicode'  title='Font Converter' >TamilLexicon</a></div>
 <div ><a href='https://www.url-encode-decode.com/'  title='URLEncode' >URLEncode</a></div>
 <div ><a href='http://www.convertcsv.com/generate-test-data.htm#keywords'  title='Sample Data, CSV to XML, Json etc' >GenData</a></div>
@@ -368,7 +373,7 @@ document.writeln("</select></span>" +	"</div>");
 <div ><a href='https://ipinfo.io/ip'  title='Obtain public IP' >PublicIP</a></div>
 <div ><a href='https://srirangaminfo.com/Tamil-daily-calendar.php'  title='Daily sheet  Calendar' >DailySheet</a></div>
 <div ><a href='https://www.removepaywall.com/'  title='Paywall Remover' >RemovePayWall</a></div></div>
-<div class='flex1' ><div class='cat' >Beautifiers</div>
+<div class='flex1 even_row' ><div class='cat' >Beautifiers</div>
 <div ><a href='http://www.cleancss.com/css-beautify/'  title='CSS Beautifier' >CSS</a></div>
 <div ><a href='https://www.freeformatter.com/css-beautifier.html'  title='CSS Beauty' >CSS 2</a></div>
 <div ><a href='http://www.freeformatter.com/html-formatter.html#ad-output'  title='HTML Beautifier' >HTML</a></div>
@@ -377,7 +382,7 @@ document.writeln("</select></span>" +	"</div>");
 <div ><a href='http://jsbeautifier.org/'  title='JavaScript Beautifier' >Javascript</a></div>
 <div ><a href='https://www.automateexcel.com/vba-code-indenter/'  title='VBA Beauty' >VBA</a></div>
 <div ><a href='https://vbindent.com/?indent'  title='VBA Beauty' >VBA2</a></div></div>
-<div class='flex1' ><div class='cat' >Downloader</div>
+<div class='flex1 odd_row' ><div class='cat' >Downloader</div>
 <div ><a href='https://fastdl.app/en'  title='Instagram downloader' >FastDL</a></div>
 <div ><a href='https://ssyoutube.online/en2/'  title='Youtube video downloader' >YTD</a></div>
 <div ><a href='https://v2.yt1s.biz/youtube-to-mp4/'  title='Y1d' >Y1D</a></div>
@@ -386,7 +391,7 @@ document.writeln("</select></span>" +	"</div>");
 <div ><a href='https://snapinsta.to/en1/instagram-video-downloader'  title='Snap Instagram downloader' >SnapIns</a></div>
 <div ><a href='https://all-free-download.com/free-vector/'  title='Free Vector Images' >FreeVector</a></div>
 <div ><a href='https://www.kisspng.com/'  title='Free PNG Files' >kPNG</a></div></div>
-<div class='flex1' ><div class='cat' >Tutorials</div>
+<div class='flex1 even_row' ><div class='cat' >Tutorials</div>
 <div ><a href='https://beginnersbook.com/java-tutorial-for-beginners-with-examples/'  title='BeginnersBook' >BeginnersBook</a></div>
 <div ><a href='https://www.geeksforgeeks.org/java/?ref=leftbar'  title='GeeksForGeeks' >GeeksForGeeks</a></div>
 <div ><a href='https://howtodoinjava.com/java/basics/java-tutorial/'  title='HowToDoInJava' >HowToDoInJava</a></div>
@@ -398,7 +403,7 @@ document.writeln("</select></span>" +	"</div>");
 <div ><a href='http://www.tutorialrepublic.com/'  title='Tutorialrepublic Good Tutorials' >TutorialRepublic</a></div>
 <div ><a href='https://www.w3schools.com/java/java_ref_math.asp'  title='W3Schools Tutorial and Examples' >W3Schools</a></div>
 <div ><a href='https://www.excel-easy.com/'  title='ExcelTips' >ExcelTips</a></div></div>
-<div class='flex1' ><div class='cat' >Reference</div>
+<div class='flex1 odd_row' ><div class='cat' >Reference</div>
 <div ><a href='http://www.w3schools.com/tags/default.asp'  title='HTML Tag Reference' >HTML</a></div>
 <div ><a href='https://developer.mozilla.org/en-US/docs/Web/HTML'  title='Mozilla HTML Reference' >MozHTML</a></div>
 <div ><a href='http://www.w3schools.com/cssref/default.asp'  title='CSS Reference' >CSS</a></div>
@@ -412,13 +417,13 @@ document.writeln("</select></span>" +	"</div>");
 <div ><a href='https://www.sqlitetutorial.net/'  title='SQLite Tutorial' >SQLite</a></div>
 <div ><a href='https://webcode.tools/generators/html/dialog'  title='HTML Tag Reference' >HTML2</a></div>
 <div ><a href='https://pandas.pydata.org/docs/user_guide/10min.html'  title='Pandas Documentation' >Pandas</a></div></div>
-<div class='flex1' ><div class='cat' >Portables</div>
+<div class='flex1 even_row' ><div class='cat' >Portables</div>
 <div ><a href='http://portableappz.blogspot.com/' >PortableAppz</a></div>
 <div ><a href='http://www.portablefreeware.com/' >PortableFreeware</a></div>
 <div ><a href='http://www.oldversion.com/' >OldVers</a></div>
 <div ><a href='http://www.filehippo.com/' >FileHippo</a></div>
 <div ><a href='https://winworldpc.com/'  title='Old DOS Windows Programs' >AbondonWare</a></div></div>
-<div class='flex1' ><div class='cat' >Others</div>
+<div class='flex1 odd_row' ><div class='cat' >Others</div>
 <div ><a href='https://www.tnebnet.org/awp/login' >TNEB</a></div>
 <div ><a href='http://www.valkstoneps.vic.edu.au/' >Valkstone</a></div>
 <div ><a href='https://www.awesomeinventions.com/'  title='Awsome Inventions' >Inventions</a></div>
@@ -431,7 +436,7 @@ document.writeln("</select></span>" +	"</div>");
 <div ><a href='http://www.speedtest.net/' >SpeedTest</a></div>
 <div ><a href='http://www.connectionstrings.com/'  title='Connect String Examples Good' >Conn</a></div>
 <div ><a href='https://www.grc.com/x/ne.dll?bh0bkyd2' >Ports</a></div></div>
-<div class='flex1' ><div class='cat' >Projects</div>
+<div class='flex1 even_row' ><div class='cat' >Projects</div>
 <div ><a href='http://localhost/projects/learn/0ShowIndex.php'  title='Sankar Learning Resources' >Workshop</a></div>
 <div ><a href='http://localhost/projects/library/library.php'  title='Sankar Searcheable Book Collections' >Library</a></div>
 <div ><a href='http://localhost/Projects/Calibre/Search.php'  title='Sankar Calibre English Book Collections' >Calibre</a></div>
