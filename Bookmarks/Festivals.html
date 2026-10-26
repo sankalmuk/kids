@@ -262,7 +262,7 @@ const REPOSITORY_OWNER = "sankalmuk"; // ← change when mirroring to another Gi
 // Festival list — index matches ?q= URL parameter (e.g. Festivals.html?q=5)
 const FF = [
   "Ramanavami",          // 0  ← default
-  "Cricket",             // 1
+  "Damodar",             // 1
   "Gaurapoornima",       // 2
   "GitaJayanthi",        // 3
   "Hindu",               // 4
@@ -278,7 +278,7 @@ const FF = [
 
 // Read ?q= from URL; clamp to valid range; default to 0
 const _qParam = parseInt(new URLSearchParams(window.location.search).get("q") || "0", 10);
-const _qIndex = (!isNaN(_qParam) && _qParam >= 0 && _qParam < FF.length) ? _qParam : 0;
+const _qIndex = (!isNaN(_qParam) && _qParam >= 0 && _qParam < FF.length) ? _qParam : 1;
 const FESTIVAL_NAME = FF[_qIndex];
 
 // Logo files live in a Logo/ subfolder — discovered via GitHub Contents API
